@@ -1,4 +1,4 @@
-**School Management System Overview**
+**Online Course Management System Overview**
 
 The School Management System is a Java application designed to manage student records, teacher records, student marks, and exam details efficiently. It features an interactive GUI and leverages a MySQL database for data management. This project serves as a foundational learning tool and can be extended to meet advanced requirements.
 
