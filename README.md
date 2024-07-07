@@ -98,7 +98,8 @@ Below are the sample screenshots of the School Management System:
 ![image](https://github.com/Lindsay199904/Online-Course-Management-System-/assets/72949658/9332fd9d-66d1-4367-a57c-3ad844c044a3)
 
 8. **Mark Management**
-![image](https://github.com/Lindsay199904/Online-Course-Management-System-/assets/72949658/079c79fd-5eba-4f23-8d59-5e1d85bdd75c)
+![image](https://github.com/Lindsay199904/Online-Course-Management-System-/assets/72949658/3f3d4ae5-3d7f-4a25-90dd-de5dd7eec45b)
+
 
 
 These screenshots illustrate the various modules and their interfaces, providing a visual representation of the system's functionality.
