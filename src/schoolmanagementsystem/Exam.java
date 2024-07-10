@@ -27,7 +27,7 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @author Name
+ * @Lindsay blood
  */
 public class Exam extends javax.swing.JFrame {
 
@@ -53,6 +53,10 @@ public class Exam extends javax.swing.JFrame {
     int id;
     String uname;
     String usertype;
+    
+    /**
+     * Method to add exam details in the portal
+     */
 
     public Exam(int id, String username, String utype) {
         setIconImage();

@@ -17,13 +17,10 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 /**
  *
- * @author Name
+ * @lindsay blood
  */
 public class Mark extends javax.swing.JFrame {
 
@@ -49,6 +46,10 @@ public class Mark extends javax.swing.JFrame {
     int id;
     String uname;
     String usertype;
+    
+    /**
+     * Method to add marks 
+     */
 
     public Mark(int id, String username, String utype) {
         setIconImage();
@@ -149,7 +150,9 @@ public class Mark extends javax.swing.JFrame {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+ /**
+     * Method to load marks
+     */
     public void Mark_Load() {
         int c;
         try {

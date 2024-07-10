@@ -22,7 +22,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Name
+ * @Lindsay blood
  */
 public class Login extends javax.swing.JFrame {
 

@@ -22,7 +22,7 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @author Name
+ * @Lindsay blood
  */
 public class Student extends javax.swing.JFrame {
 
@@ -47,7 +47,9 @@ public class Student extends javax.swing.JFrame {
     int id;
     String uname;
     String usertype;
-
+/**
+     * Method to add student details to the db
+     */
     public Student(int id, String username, String utype) {
         initComponents();
         Connect();

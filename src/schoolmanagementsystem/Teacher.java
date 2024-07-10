@@ -23,7 +23,7 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @author Name
+ * @Lindsay blood
  */
 public class Teacher extends javax.swing.JFrame {
 
@@ -46,7 +46,9 @@ public class Teacher extends javax.swing.JFrame {
     int id;
     String uname;
     String usertype;
-
+  /**
+     * Method to add teacher info and assign it to class and student
+     */
     public Teacher(int id, String username, String utype) {
         setIconImage();
         setTitle("Teacher page");

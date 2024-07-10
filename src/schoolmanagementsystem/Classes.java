@@ -23,7 +23,7 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @author Name
+ * @Lindsay blood
  */
 public class Classes extends javax.swing.JFrame {
 
@@ -46,6 +46,10 @@ public class Classes extends javax.swing.JFrame {
     int id;
     String uname;
     String usertype;
+    
+    /**
+     * Method to add class and load class
+     */
 
     public Classes(int id, String username, String utype) {
         initComponents();

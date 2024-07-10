@@ -26,7 +26,7 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @author Name
+ * @Lindsay blood
  */
 public class User extends javax.swing.JFrame {
 
@@ -49,7 +49,9 @@ public class User extends javax.swing.JFrame {
     int id;
     String uname;
     String usertype;
-
+  /**
+     * Method to add users and what type of user he is either admin or student ot teacher
+     */
     public User(int id, String username, String utype) {
         setIconImage();
         setTitle("User page");

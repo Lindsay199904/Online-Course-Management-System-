@@ -14,12 +14,12 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Name
+ * @Lindsay blood
  */
 public class Main extends javax.swing.JFrame {
 
     /**
-     * Creates new form Main
+     * Creates new form Main this will start the application
      */
     public Main() {
         initComponents();

@@ -23,7 +23,7 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @author Name
+ * @Lindsay Blood
  */
 public class Subject extends javax.swing.JFrame {
 
@@ -46,6 +46,10 @@ public class Subject extends javax.swing.JFrame {
     int id;
     String uname;
     String usertype;
+    
+    /**
+     * Method to add subject info and assign it to class and student
+     */
 
     public Subject(int id, String username, String utype) {
         setIconImage();

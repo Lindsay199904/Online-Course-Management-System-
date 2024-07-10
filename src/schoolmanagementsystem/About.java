@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Name
+ * @Lindsay Blood
  */
 public class About extends javax.swing.JFrame {
 
