@@ -1722,7 +1722,7 @@ is divided into following sections:
                 ===============
                 CLEANUP SECTION
                 ===============
-            -->
+         -->
     <target name="-deps-clean-init" unless="built-clean.properties">
         <property location="${build.dir}/built-clean.properties" name="built-clean.properties"/>
         <delete file="${built-clean.properties}" quiet="true"/>
