@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @Lindsay Blood
+ * @Lindsay M Blood
  */
 public class About extends javax.swing.JFrame {
 
