@@ -27,7 +27,7 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @Lindsay blood
+  * @Lindsay M Blood
  */
 public class Exam extends javax.swing.JFrame {
 
