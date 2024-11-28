@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package schoolmanagementsystem;
-
 import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -22,7 +21,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @Lindsay blood
+ * @Lindsay M blood
  */
 public class Login extends javax.swing.JFrame {
 
@@ -44,7 +43,7 @@ public class Login extends javax.swing.JFrame {
     public void Connect() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            con = DriverManager.getConnection("jdbc:mysql://localhost/school_management_system", "root", "");
+            con = DriverManager.getConnection("jdbc:mysql://localhost/cst-452", "root", "root");
         } catch (SQLException ex) {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
