@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package schoolmanagementsystem;
-
 import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.io.IOException;
@@ -14,7 +13,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @Lindsay blood
+ * @Lindsay M blood
  */
 public class Main extends javax.swing.JFrame {
 
