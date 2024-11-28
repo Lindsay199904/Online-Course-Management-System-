@@ -98,7 +98,8 @@ public class Mark extends javax.swing.JFrame {
     public void Connect() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            con = DriverManager.getConnection("jdbc:mysql://localhost/school_management_system", "root", "");
+           // con = DriverManager.getConnection("jdbc:mysql://localhost/school_management_system", "root", "");
+           con = DriverManager.getConnection("jdbc:mysql://localhost/cst-452", "root", "root");
         } catch (SQLException ex) {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
