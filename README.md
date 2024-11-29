@@ -1,114 +1,80 @@
-Online Course Management System Overview
 
-The School Management System is a Java application designed to manage student records, teacher records, student marks, and exam details efficiently. It features an interactive GUI and leverages a MySQL database for data management. This project serves as a foundational learning tool and can be extended to meet advanced requirements.
+# Online School Management System (OSMS)
 
-Available Modules
+ Introduction
+The Online School Management System (OSMS) is a Java-based application designed to streamline school operations. It offers robust features for administrators, teachers, and students, making it easier to manage day-to-day school activities like scheduling classes, exams, and tracking student performance.
 
-1. Login/Logout Module
-   - Purpose: Secure user authentication and session management.
-   - Key Features: 
-     - User login and logout functionality.
-     - Session handling to ensure secure access.
+---
 
-2. Account Management
-   - Purpose: Manage user accounts and roles.
-   - Key Features:
-     - Creation and modification of user accounts.
-     - Role assignment and permissions management.
+ Features
+- User Management:
+  - Admin, Teacher, and Student roles with specific permissions.
+- Class Management:
+  - CRUD operations for creating, editing, and managing classes and sections.
+- Exam Scheduling:
+  - Assign subjects, dates, and classes to exams.
+- Student Management:
+  - Manage student profiles, parent details, and class assignments.
+- Teacher Management:
+  - Manage teacher profiles, qualifications, and subjects.
 
-3. Class Management
-   - Purpose: Organize and manage classes and sections.
-   - Key Features:
-     - Creation and modification of classes.
-     - Assigning students and teachers to classes.
+---
 
-4. Subject Management
-   - Purpose: Manage subjects offered by the school.
-   - Key Features:
-     - Addition, modification, and deletion of subjects.
-     - Assigning subjects to classes and teachers.
-
-5. Exam Management
-   - Purpose: Manage exams and schedules.
-   - Key Features:
-     - Scheduling exams.
-     - Recording and managing exam details.
-
-6. Student Management
-   - Purpose: Handle student records and details.
-   - Key Features:
-     - Enrollment of new students.
-     - Modification of student details.
-     - Viewing and managing student records.
-
-7. Mark Management
-   - Purpose: Record and manage student marks.
-   - Key Features:
-     - Entry and modification of student marks.
-     - Generation of mark sheets and reports.
-
-8. Teacher Management
-   - Purpose: Manage teacher records and assignments.
-   - Key Features:
-     - Recording teacher details.
-     - Managing teacher assignments to classes and subjects.
-
-### Project Features
-
-- Interactive GUI: User-friendly interface for easy navigation and operation.
-- Database Integration: Utilizes MySQL database for robust data management and storage.
-- Extensible Design: Can be modified and extended to add new features and functionalities as needed.
-
-### Implementation Overview
-
+ Technical Details
+# Technology Stack
 - Programming Language: Java
+- IDE: NetBeans
 - Database: MySQL
-- IDE: Any Java-compatible IDE (e.g., IntelliJ IDEA, Eclipse)
-- Libraries: JDBC for database connectivity, Swing for GUI components.
+- UI: Swing Framework
+- Connectivity: JDBC
 
-### Sample Screenshots
+# Database Schema
+- Tables:
+  - `class`: Stores class details (name, section, student strength).
+  - `exam`: Details about exams (name, term, date, subject).
+  - `student`: Profiles of students, including contact and class details.
+  - `teacher`: Teacher profiles with qualifications and subjects.
 
-Below are the sample screenshots of the School Management System:
+---
 
-1. Login Screen
-![image](https://github.com/Lindsay199904/Online-Course-Management-System-/assets/72949658/acf59e1e-7e76-4a13-9bca-605d2dbff211)
+ Installation and Setup
+1. Clone the Repository:
+   bash
+   git clone https://github.com/Lindsay199904/Online-Course-Management-System-.git
+   cd Online-Course-Management-System
+   
 
-2. Dashboard
-![image](https://github.com/Lindsay199904/Online-Course-Management-System-/assets/72949658/03e682d3-4651-495e-8499-5aee9e94dd2b)
+2. Set Up MySQL Database:
+   - Import the provided `school_management_system.sql` file.
+   - Ensure MySQL is running and update the database credentials in the Java code:
+     java
+     con = DriverManager.getConnection("jdbc:mysql://localhost/school_management_system", "username", "password");
+     
 
+3. Run the Application:
+   - Open the project in NetBeans.
+   - Build and run the project.
 
-3. Student Management
+---
 
-![image](https://github.com/Lindsay199904/Online-Course-Management-System-/assets/72949658/a0b4db60-c032-4677-b000-61bd4c6e3cd6)
+ Deployment (Optional)
+To host the OSMS application:
+1. Package the application as a JAR file using NetBeans.
+2. Deploy it on a platform like:
+   - AWS Elastic Beanstalk: For scalable deployments.
+   - Azure App Services: Suitable for hosting Java applications.
+   - Heroku: For free-tier deployments with database integration.
 
-4. Teacher Management
-![image](https://github.com/Lindsay199904/Online-Course-Management-System-/assets/72949658/b7217db9-36ed-41f3-89b8-59672bd7eed1)
+---
 
+ Future Improvements
+- Integration with cloud-hosted databases.
+- Mobile-friendly UI for student and parent access.
+- Adding real-time notifications for exam schedules and updates.
 
-5. Class Management
+---
 
-![image](https://github.com/Lindsay199904/Online-Course-Management-System-/assets/72949658/9b8996ee-9787-42cd-9619-9882bdd3c14a)
+ Contributors
+- Lindsay M. Blood
 
-6. Subject Management
-![image](https://github.com/Lindsay199904/Online-Course-Management-System-/assets/72949658/79876ed4-fe7b-42f2-abfa-2587d6d6d1a7)
-
-
-7. Exam Management
-
-![image](https://github.com/Lindsay199904/Online-Course-Management-System-/assets/72949658/9332fd9d-66d1-4367-a57c-3ad844c044a3)
-
-8. Mark Management
-![image](https://github.com/Lindsay199904/Online-Course-Management-System-/assets/72949658/3f3d4ae5-3d7f-4a25-90dd-de5dd7eec45b)
-
-
-
-These screenshots illustrate the various modules and their interfaces, providing a visual representation of the system's functionality.
-
-### Future Enhancements
-
-- Role-Based Access Control: Implement finer-grained access control based on user roles.
-- Advanced Reporting: Develop comprehensive reporting features for better insights.
-- Mobile App Integration: Create a mobile version for easier access on smartphones and tablets.
-- Automated Notifications: Integrate email or SMS notifications for important events and updates.
-
-This project provides a solid foundation for building a comprehensive school management system and can be customized to meet specific requirements.
+Feel free to submit issues or suggestions to enhance the project!
