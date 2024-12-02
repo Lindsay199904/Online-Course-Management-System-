@@ -19,50 +19,51 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
-
 /**
- *
+ * Class to handle the Mark management page in the School Management System.
+ * Provides functionality to load, add, edit, and delete marks.
+ * 
  * @lindsay blood
  */
 public class Mark extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Mark
-     */
+    // Default constructor to initialize components and set up the page
     public Mark() {
-        initComponents();
-        Connect();
-        Subject_Load();
-        Examterm_Load();
-        Mark_Load();
-        Class_Load();
-        setIconImage();
-        setTitle("Mark page");
+        initComponents(); // Initialize UI components
+        Connect(); // Establish database connection
+        Subject_Load(); // Load subjects into the dropdown
+        Examterm_Load(); // Load exam terms into the dropdown
+        Mark_Load(); // Load marks data into the table
+        Class_Load(); // Load class data into the dropdown
+        setIconImage(); // Set custom application icon
+        setTitle("Mark page"); // Set window title
     }
 
+    // Method to set the application icon
     private void setIconImage() {
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png")));
-
     }
 
+    // Class-level variables to store user details and database connection
     int id;
     String uname;
     String usertype;
-    
+
     /**
-     * Method to add marks 
+     * Overloaded constructor to initialize with user-specific data.
+     * Sets up permissions based on user type.
      */
-
     public Mark(int id, String username, String utype) {
-        setIconImage();
-        setTitle("Mark page");
-        initComponents();
-        Connect();
-        Subject_Load();
-        Examterm_Load();
-        Mark_Load();
-        Class_Load();
+        setIconImage(); // Set application icon
+        setTitle("Mark page"); // Set window title
+        initComponents(); // Initialize UI components
+        Connect(); // Establish database connection
+        Subject_Load(); // Load subjects
+        Examterm_Load(); // Load exam terms
+        Mark_Load(); // Load marks
+        Class_Load(); // Load classes
 
+        // Assign user details
         this.uname = username;
         jLabel20.setText(uname);
 
@@ -70,64 +71,67 @@ public class Mark extends javax.swing.JFrame {
         jLabel30.setText(utype);
 
         this.id = id;
-        if (utype.equals("Student")) {
+
+        // Adjust button permissions based on user type
+        if (utype.equals("Student") || utype.equals("Guest")) {
             savebutton.setEnabled(false);
             editbutton.setEnabled(false);
             deletebutton.setEnabled(false);
             clearbutton.setEnabled(false);
-        }
-
-        if (utype.equals("Guest")) {
-            savebutton.setEnabled(false);
-            editbutton.setEnabled(false);
-            deletebutton.setEnabled(false);
-            clearbutton.setEnabled(false);
-
         } else {
             savebutton.setEnabled(true);
             editbutton.setEnabled(true);
             deletebutton.setEnabled(true);
             clearbutton.setEnabled(true);
         }
-
     }
 
+    // Database connection variables
     Connection con;
     PreparedStatement pst;
     ResultSet rs;
     DefaultTableModel d;
 
-       public void Connect() {
-    try {
-        // Load properties file
-        Properties properties = new Properties();
-        properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
-
-        // Get database details
-        String url = properties.getProperty("db.url");
-        String username = properties.getProperty("db.username");
-        String password = properties.getProperty("db.password");
-
-        // Load database driver
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        con = DriverManager.getConnection(url, username, password);
-        System.out.println("Database connection successful.");
-    } catch (IOException e) {
-        System.out.println("Error loading properties file: " + e.getMessage());
-    } catch (SQLException ex) {
-        Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
-    } catch (ClassNotFoundException ex) {
-        Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-    }
-}
-
-    public void Subject_Load() {
-
+    /**
+     * Method to establish a connection to the database.
+     * Reads configuration details from a properties file.
+     */
+    public void Connect() {
         try {
+            // Load properties file with database configuration
+            Properties properties = new Properties();
+            properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
+
+            // Retrieve database details from properties
+            String url = properties.getProperty("db.url");
+            String username = properties.getProperty("db.username");
+            String password = properties.getProperty("db.password");
+
+            // Load and initialize the database driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Establish connection to the database
+            con = DriverManager.getConnection(url, username, password);
+            System.out.println("Database connection successful.");
+        } catch (IOException e) {
+            System.out.println("Error loading properties file: " + e.getMessage());
+        } catch (SQLException ex) {
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Load subject names from the database into the subject dropdown.
+     */
+    public void Subject_Load() {
+        try {
+            // Query to retrieve unique subject names
             pst = con.prepareStatement("select Distinct subjectname from subject");
             rs = pst.executeQuery();
 
-            //txtclass.removeAllItems();
+            // Populate the dropdown
             while (rs.next()) {
                 txtsubject.addItem(rs.getString("subjectname"));
             }
@@ -136,13 +140,16 @@ public class Mark extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Load exam terms from the database into the term dropdown.
+     */
     public void Examterm_Load() {
-
         try {
+            // Query to retrieve unique exam terms
             pst = con.prepareStatement("select Distinct examterm from exam");
             rs = pst.executeQuery();
 
-            //txtclass.removeAllItems();
+            // Populate the dropdown
             while (rs.next()) {
                 txtterm.addItem(rs.getString("examterm"));
             }
@@ -151,13 +158,16 @@ public class Mark extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Load class names from the database into the class dropdown.
+     */
     public void Class_Load() {
-
         try {
+            // Query to retrieve unique class names
             pst = con.prepareStatement("select Distinct classname from class");
             rs = pst.executeQuery();
 
-            //txtclass.removeAllItems();
+            // Populate the dropdown
             while (rs.next()) {
                 txtclass.addItem(rs.getString("classname"));
             }
@@ -165,20 +175,26 @@ public class Mark extends javax.swing.JFrame {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
- /**
-     * Method to load marks
+
+    /**
+     * Load marks data from the database into the table.
      */
     public void Mark_Load() {
-        int c;
+        int c; // Column count
         try {
+            // Query to retrieve all marks data
             pst = con.prepareStatement("select * from mark");
             rs = pst.executeQuery();
 
+            // Get metadata to determine the number of columns
             ResultSetMetaData rsd = rs.getMetaData();
             c = rsd.getColumnCount();
 
+            // Prepare table model
             d = (DefaultTableModel) jTable1.getModel();
-            d.setRowCount(0);
+            d.setRowCount(0); // Clear existing rows
+
+            // Populate table with rows from the result set
             while (rs.next()) {
                 Vector v2 = new Vector();
                 for (int i = 1; i <= c; i++) {
@@ -188,7 +204,6 @@ public class Mark extends javax.swing.JFrame {
                     v2.add(rs.getString("class"));
                     v2.add(rs.getString("marks"));
                     v2.add(rs.getString("term"));
-
                 }
                 d.addRow(v2);
             }
