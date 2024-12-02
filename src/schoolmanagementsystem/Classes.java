@@ -24,122 +24,133 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
- *
- * @Lindsay blood
+ * Manages class-related operations in the School Management System.
+ * Includes CRUD functionality for classes and role-based access control.
+ * 
+ * @Author Lindsay Blood
  */
 public class Classes extends javax.swing.JFrame {
 
     /**
-     * Creates new form NewClasses
+     * Default constructor to initialize the form and load class data.
      */
     public Classes() {
-        initComponents();
-        Connect();
-        Class_Load();
-        setIconImage();
-        setTitle("class page");
+        initComponents(); // Initialize UI components
+        Connect(); // Establish connection to the database
+        Class_Load(); // Load class data into the table
+        setIconImage(); // Set application icon
+        setTitle("class page"); // Set the title of the window
     }
 
+    /**
+     * Sets the application icon using a resource.
+     */
     private void setIconImage() {
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png")));
-
     }
 
+    // Variables for user details
     int id;
     String uname;
     String usertype;
     
     /**
-     * Method to add class and load class
+     * Parameterized constructor to initialize form with role-based access control.
+     * 
+     * @param id       User ID
+     * @param username Username of the user
+     * @param utype    Type of user (e.g., Admin, Guest, Student)
      */
-
     public Classes(int id, String username, String utype) {
-        initComponents();
-        Connect();
-        Class_Load();
-        setIconImage();
-        setTitle("class page");
-        this.uname = username;
-        jLabel20.setText(uname);
+        initComponents(); // Initialize UI components
+        Connect(); // Establish connection to the database
+        Class_Load(); // Load class data into the table
+        setIconImage(); // Set application icon
+        setTitle("class page"); // Set the title of the window
+        this.uname = username; // Assign username
+        jLabel20.setText(uname); // Display username on the UI
 
-        this.usertype = utype;
-        jLabel30.setText(utype);
+        this.usertype = utype; // Assign user type
+        jLabel30.setText(utype); // Display user type on the UI
 
-        this.id = id;
+        this.id = id; // Assign user ID
 
-        if (utype.equals("Student")) {
+        // Disable buttons based on user role
+        if (utype.equals("Student") || utype.equals("Guest")) {
             savebutton.setEnabled(false);
             editbutton.setEnabled(false);
             deletebutton.setEnabled(false);
             clearbutton.setEnabled(false);
-        }
-
-        if (utype.equals("Guest")) {
-            savebutton.setEnabled(false);
-            editbutton.setEnabled(false);
-            deletebutton.setEnabled(false);
-            clearbutton.setEnabled(false);
-
         } else {
+            // Enable buttons for other roles
             savebutton.setEnabled(true);
             editbutton.setEnabled(true);
             deletebutton.setEnabled(true);
             clearbutton.setEnabled(true);
         }
-
     }
 
+    // Database-related variables
     Connection con;
     PreparedStatement pst;
     ResultSet rs;
     DefaultTableModel d;
 
-       public void Connect() {
-    try {
-        // Load properties file
-        Properties properties = new Properties();
-        properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
+    /**
+     * Establishes a connection to the database using configuration from a properties file.
+     */
+    public void Connect() {
+        try {
+            // Load database credentials from properties file
+            Properties properties = new Properties();
+            properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
 
-        // Get database details
-        String url = properties.getProperty("db.url");
-        String username = properties.getProperty("db.username");
-        String password = properties.getProperty("db.password");
+            String url = properties.getProperty("db.url"); // Database URL
+            String username = properties.getProperty("db.username"); // Database username
+            String password = properties.getProperty("db.password"); // Database password
 
-        // Load database driver
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        con = DriverManager.getConnection(url, username, password);
-        System.out.println("Database connection successful.");
-    } catch (IOException e) {
-        System.out.println("Error loading properties file: " + e.getMessage());
-    } catch (SQLException ex) {
-        Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
-    } catch (ClassNotFoundException ex) {
-        Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            // Load MySQL JDBC driver and establish connection
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection(url, username, password);
+            System.out.println("Database connection successful.");
+        } catch (IOException e) {
+            // Handle file-related exceptions
+            System.out.println("Error loading properties file: " + e.getMessage());
+        } catch (SQLException ex) {
+            // Handle SQL exceptions
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            // Handle missing JDBC driver exception
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-}
 
+    /**
+     * Loads class details from the database and displays them in the table.
+     */
     public void Class_Load() {
         int c;
         try {
-            pst = con.prepareStatement("select * from class");
-            rs = pst.executeQuery();
+            pst = con.prepareStatement("select * from class"); // SQL query to fetch class data
+            rs = pst.executeQuery(); // Execute the query
 
-            ResultSetMetaData rsd = rs.getMetaData();
-            c = rsd.getColumnCount();
+            ResultSetMetaData rsd = rs.getMetaData(); // Get metadata of the result set
+            c = rsd.getColumnCount(); // Get the number of columns
 
-            d = (DefaultTableModel) jTable1.getModel();
-            d.setRowCount(0);
+            d = (DefaultTableModel) jTable1.getModel(); // Get table model
+            d.setRowCount(0); // Clear existing data in the table
             while (rs.next()) {
-                Vector v2 = new Vector();
+                Vector v2 = new Vector(); // Create a vector to hold the row data
                 for (int i = 1; i <= c; i++) {
-                    v2.add(rs.getString("id"));
-                    v2.add(rs.getString("classname"));
-                    v2.add(rs.getString("section"));
-                    v2.add(rs.getString("student_strength"));
+                    v2.add(rs.getString("id")); // Add class ID
+                    v2.add(rs.getString("classname")); // Add class name
+                    v2.add(rs.getString("section")); // Add section
+                    v2.add(rs.getString("student_strength")); // Add student strength
                 }
-                d.addRow(v2);
+                d.addRow(v2); // Add row to the table
             }
         } catch (SQLException ex) {
+            // Log SQL exceptions
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -374,9 +385,8 @@ public class Classes extends javax.swing.JFrame {
     }// </editor-fold>                        
 
     private void savebuttonActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        // TODO add your handling code here:
+        // Insert new class details into the database
         try {
-            // TODO add your handling code here:
             String name = txtclassname.getSelectedItem().toString();
             String section = txtsection.getSelectedItem().toString();
             String student_strength = txtstudentstrength.getText();
@@ -396,9 +406,8 @@ public class Classes extends javax.swing.JFrame {
     }                                          
 
     private void deletebuttonActionPerformed(java.awt.event.ActionEvent evt) {                                             
-        // TODO add your handling code here:
+        // Delete selected class details from the database
         try {
-            // TODO add your handling code here:
             d = (DefaultTableModel) jTable1.getModel();
             int selectIndex = jTable1.getSelectedRow();
 
@@ -423,7 +432,7 @@ public class Classes extends javax.swing.JFrame {
     }                                            
 
     private void clearbuttonActionPerformed(java.awt.event.ActionEvent evt) {                                            
-        // TODO add your handling code here:
+        // Clear input fields for class details
         txtclassname.setSelectedIndex(0);
         txtsection.setSelectedIndex(0);
         txtstudentstrength.setText("");
@@ -432,9 +441,8 @@ public class Classes extends javax.swing.JFrame {
     }                                           
 
     private void editbuttonActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        // TODO add your handling code here:
+        // Update existing class details in the database
         try {
-            // TODO add your handling code here:
             d = (DefaultTableModel) jTable1.getModel();
             int selectIndex = jTable1.getSelectedRow();
 
@@ -466,21 +474,21 @@ public class Classes extends javax.swing.JFrame {
     }                                          
 
     private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {                                    
-        // TODO add your handling code here:
+        // Navigate to the main menu
         Main m = new Main(id, uname, usertype);
         m.setVisible(true);
         this.setVisible(false);
     }                                   
 
     private void jMenu2MouseClicked(java.awt.event.MouseEvent evt) {                                    
-        // TODO add your handling code here:
+        // Navigate to the "About Project" page
         About a = new About();
         a.setVisible(true);
         this.setVisible(false);
     }                                   
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {                                     
-        // TODO add your handling code here:
+        // Load selected row details into the input fields
         d = (DefaultTableModel) jTable1.getModel();
         int selectIndex = jTable1.getSelectedRow();
 
@@ -494,9 +502,8 @@ public class Classes extends javax.swing.JFrame {
     }                                    
 
     private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {                                     
-        // TODO add your handling code here:
+        // Open developer's GitHub profile in the default browser
         try {
-            // TODO add your handling code here:
             Desktop.getDesktop().browse(new URI("https://github.com/naveenkumar-j"));
         } catch (IOException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
@@ -506,21 +513,20 @@ public class Classes extends javax.swing.JFrame {
     }                                    
 
     private void jLabel7MouseClicked(java.awt.event.MouseEvent evt) {                                     
-        // TODO add your handling code here:
+        // Logout and navigate to the Login page
         Login l = new Login();
         l.setVisible(true);
         this.setVisible(false);
     }                                    
 
     /**
-     * @param args the command line arguments
+     * Main method to launch the Classes form.
+     * 
+     * @param args Command-line arguments
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -529,15 +535,14 @@ public class Classes extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Classes.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Classes.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Classes.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Classes.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Classes.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Classes.class.getName()).log(Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Classes.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Classes.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
