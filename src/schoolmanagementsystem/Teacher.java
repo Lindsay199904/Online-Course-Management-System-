@@ -1,144 +1,133 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
-package schoolmanagementsystem;
-
-import java.awt.Desktop;
-import java.awt.Toolkit;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.Properties;
-import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
-
 /**
- *
- * @Lindsay blood
+ * Connects to the database and fetches teacher information. 
+ * Initializes GUI components and sets up the teacher page.
  */
 public class Teacher extends javax.swing.JFrame {
 
     /**
-     * Creates new form Teacher
+     * Default constructor for the Teacher class.
+     * Initializes the form and loads teacher data.
      */
     public Teacher() {
-        initComponents();
-        Connect();
-        Teacher_Load();
-        setIconImage();
-        setTitle("Teacher page");
+        initComponents(); // Initialize GUI components
+        Connect(); // Establish a database connection
+        Teacher_Load(); // Load teacher details into the table
+        setIconImage(); // Set the application icon
+        setTitle("Teacher page"); // Set the window title
     }
 
+    /**
+     * Sets the application icon from a resource file.
+     */
     private void setIconImage() {
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png")));
-
     }
 
-    int id;
-    String uname;
-    String usertype;
-  /**
-     * Method to add teacher info and assign it to class and student
+    int id; // Holds the ID of the current user
+    String uname; // Stores the username
+    String usertype; // Stores the type of user (Admin, Teacher, etc.)
+
+    /**
+     * Constructor to initialize the Teacher form with user details.
+     * @param id User ID
+     * @param username Username of the logged-in user
+     * @param utype Type of user (Admin, Guest, etc.)
      */
     public Teacher(int id, String username, String utype) {
-        setIconImage();
-        setTitle("Teacher page");
-        initComponents();
-        Connect();
-        Teacher_Load();
-        this.uname = username;
-        jLabel20.setText(uname);
+        setIconImage(); // Set the application icon
+        setTitle("Teacher page"); // Set the window title
+        initComponents(); // Initialize GUI components
+        Connect(); // Establish a database connection
+        Teacher_Load(); // Load teacher details into the table
 
-        this.usertype = utype;
-        jLabel30.setText(utype);
+        this.uname = username; // Set the username
+        jLabel20.setText(uname); // Display the username on the form
 
-        this.id = id;
+        this.usertype = utype; // Set the user type
+        jLabel30.setText(utype); // Display the user type on the form
 
-        if (utype.equals("Student")) {
+        this.id = id; // Store the user ID
+
+        // Disable certain features based on user type
+        if (utype.equals("Student") || utype.equals("Guest")) {
             savebutton.setEnabled(false);
             editbutton.setEnabled(false);
             deletebutton.setEnabled(false);
             clearbutton.setEnabled(false);
-        }
-
-        if (utype.equals("Guest")) {
-            savebutton.setEnabled(false);
-            editbutton.setEnabled(false);
-            deletebutton.setEnabled(false);
-            clearbutton.setEnabled(false);
-
         } else {
             savebutton.setEnabled(true);
             editbutton.setEnabled(true);
             deletebutton.setEnabled(true);
             clearbutton.setEnabled(true);
         }
-
     }
 
-    Connection con;
-    PreparedStatement pst;
-    ResultSet rs;
-    DefaultTableModel d;
+    // Database connection objects
+    Connection con; // Connection object
+    PreparedStatement pst; // For executing SQL queries
+    ResultSet rs; // To hold query results
+    DefaultTableModel d; // Table model for displaying data
 
-       public void Connect() {
-    try {
-        // Load properties file
-        Properties properties = new Properties();
-        properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
-
-        // Get database details
-        String url = properties.getProperty("db.url");
-        String username = properties.getProperty("db.username");
-        String password = properties.getProperty("db.password");
-
-        // Load database driver
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        con = DriverManager.getConnection(url, username, password);
-        System.out.println("Database connection successful.");
-    } catch (IOException e) {
-        System.out.println("Error loading properties file: " + e.getMessage());
-    } catch (SQLException ex) {
-        Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
-    } catch (ClassNotFoundException ex) {
-        Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-    }
-}
-
-    public void Teacher_Load() {
-        int c;
+    /**
+     * Establishes a connection to the database using details from a properties file.
+     */
+    public void Connect() {
         try {
+            // Load the properties file containing database credentials
+            Properties properties = new Properties();
+            properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
+
+            // Extract database connection details
+            String url = properties.getProperty("db.url");
+            String username = properties.getProperty("db.username");
+            String password = properties.getProperty("db.password");
+
+            // Load the MySQL JDBC driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Establish the database connection
+            con = DriverManager.getConnection(url, username, password);
+            System.out.println("Database connection successful.");
+        } catch (IOException e) {
+            System.out.println("Error loading properties file: " + e.getMessage());
+        } catch (SQLException ex) {
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Loads teacher information from the database into the table.
+     */
+    public void Teacher_Load() {
+        int c; // Holds the number of columns in the result set
+        try {
+            // Prepare the SQL query to fetch teacher details
             pst = con.prepareStatement("select * from teacher");
-            rs = pst.executeQuery();
+            rs = pst.executeQuery(); // Execute the query
 
+            // Get metadata about the result set
             ResultSetMetaData rsd = rs.getMetaData();
-            c = rsd.getColumnCount();
+            c = rsd.getColumnCount(); // Get the number of columns
 
+            // Get the table model for the teacher table
             d = (DefaultTableModel) jTable1.getModel();
-            d.setRowCount(0);
+            d.setRowCount(0); // Clear existing rows in the table
+
+            // Populate the table with data from the result set
             while (rs.next()) {
                 Vector v2 = new Vector();
                 for (int i = 1; i <= c; i++) {
-                    v2.add(rs.getString("id"));
-                    v2.add(rs.getString("name"));
-                    v2.add(rs.getString("qualification"));
-                    v2.add(rs.getString("salary"));
-                    v2.add(rs.getString("phone"));
-                    v2.add(rs.getString("email"));
-                    v2.add(rs.getString("address"));
+                    v2.add(rs.getString("id")); // Teacher ID
+                    v2.add(rs.getString("name")); // Teacher name
+                    v2.add(rs.getString("qualification")); // Teacher qualification
+                    v2.add(rs.getString("salary")); // Teacher salary
+                    v2.add(rs.getString("phone")); // Teacher phone number
+                    v2.add(rs.getString("email")); // Teacher email address
+                    v2.add(rs.getString("address")); // Teacher address
                 }
-                d.addRow(v2);
+                d.addRow(v2); // Add the row to the table model
             }
         } catch (SQLException ex) {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
@@ -390,122 +379,37 @@ public class Teacher extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>                        
 
-    private void jLabel13MouseClicked(java.awt.event.MouseEvent evt) {                                      
-        // TODO add your handling code here:
-        Login l = new Login();
-        l.setVisible(true);
-        this.setVisible(false);
-    }                                     
+ private void jLabel13MouseClicked(java.awt.event.MouseEvent evt) {                                      
+    // Log out the user and navigate to the Login page
+    Login l = new Login();
+    l.setVisible(true); // Show the Login form
+    this.setVisible(false); // Hide the current form
+}                                     
 
-    private void savebuttonActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        // TODO add your handling code here:
-        try {
-            // TODO add your handling code here:
-            String name = txtname.getText();
-            String qualification = txtqualification.getText();
-            String salary = txtsalary.getText();
-            String mobile = txtmobile.getText();
-            String email = txtemail.getText();
-            String address = txtaddress.getText();
+private void savebuttonActionPerformed(java.awt.event.ActionEvent evt) {                                           
+    // Save teacher details into the database
+    try {
+        String name = txtname.getText(); // Get the teacher's name
+        String qualification = txtqualification.getText(); // Get the qualification
+        String salary = txtsalary.getText(); // Get the salary
+        String mobile = txtmobile.getText(); // Get the mobile number
+        String email = txtemail.getText(); // Get the email address
+        String address = txtaddress.getText(); // Get the address
 
-            pst = con.prepareStatement("insert into teacher(name,qualification,salary,phone,email,address)values(?,?,?,?,?,?)");
-            pst.setString(1, name);
-            pst.setString(2, qualification);
-            pst.setString(3, salary);
-            pst.setString(4, mobile);
-            pst.setString(5, email);
-            pst.setString(6, address);
-            pst.executeUpdate();
-            JOptionPane.showMessageDialog(this, "Teacher details added successfully...");
+        // Prepare and execute the SQL insert statement
+        pst = con.prepareStatement("insert into teacher(name,qualification,salary,phone,email,address)values(?,?,?,?,?,?)");
+        pst.setString(1, name);
+        pst.setString(2, qualification);
+        pst.setString(3, salary);
+        pst.setString(4, mobile);
+        pst.setString(5, email);
+        pst.setString(6, address);
+        pst.executeUpdate(); // Execute the query
 
-            txtname.setText("");
-            txtqualification.setText("");
-            txtsalary.setText("");
-            txtmobile.setText("");
-            txtemail.setText("");
-            txtaddress.setText("");
-            txtname.requestFocus();
+        // Show success message
+        JOptionPane.showMessageDialog(this, "Teacher details added successfully...");
 
-            Teacher_Load();
-        } catch (SQLException ex) {
-            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }                                          
-
-    private void editbuttonActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        // TODO add your handling code here:
-        try {
-            // TODO add your handling code here:
-            d = (DefaultTableModel) jTable1.getModel();
-            int selectIndex = jTable1.getSelectedRow();
-
-            String id = d.getValueAt(selectIndex, 0).toString();
-
-            String name = txtname.getText();
-            String qualification = txtqualification.getText();
-            String salary = txtsalary.getText();
-            String mobile = txtmobile.getText();
-            String email = txtemail.getText();
-            String address = txtaddress.getText();
-
-            pst = con.prepareStatement("update teacher set name=?,qualification=?,salary=?,phone=?,email=?,address=? where id=?");
-            pst.setString(1, name);
-            pst.setString(2, qualification);
-            pst.setString(3, salary);
-            pst.setString(4, mobile);
-            pst.setString(5, email);
-            pst.setString(6, address);
-            pst.setString(7, id);
-            pst.executeUpdate();
-            JOptionPane.showMessageDialog(this, "Teacher details edited successfully...");
-            savebutton.setEnabled(true);
-
-            txtname.setText("");
-            txtqualification.setText("");
-            txtsalary.setText("");
-            txtmobile.setText("");
-            txtemail.setText("");
-            txtaddress.setText("");
-            txtname.requestFocus();
-
-            Teacher_Load();
-
-        } catch (SQLException ex) {
-            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }                                          
-
-    private void deletebuttonActionPerformed(java.awt.event.ActionEvent evt) {                                             
-        // TODO add your handling code here:
-        try {
-            // TODO add your handling code here:
-            d = (DefaultTableModel) jTable1.getModel();
-            int selectIndex = jTable1.getSelectedRow();
-
-            String id = d.getValueAt(selectIndex, 0).toString();
-
-            pst = con.prepareStatement("delete from teacher where id=?");
-            pst.setString(1, id);
-            pst.executeUpdate();
-            JOptionPane.showMessageDialog(this, "Teacher details deleted successfully...");
-            savebutton.setEnabled(true);
-            txtname.setText("");
-            txtqualification.setText("");
-            txtsalary.setText("");
-            txtmobile.setText("");
-            txtemail.setText("");
-            txtaddress.setText("");
-            txtname.requestFocus();
-
-            Teacher_Load();
-
-        } catch (SQLException ex) {
-            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }                                            
-
-    private void clearbuttonActionPerformed(java.awt.event.ActionEvent evt) {                                            
-        // TODO add your handling code here:
+        // Clear input fields and reset focus
         txtname.setText("");
         txtqualification.setText("");
         txtsalary.setText("");
@@ -513,82 +417,178 @@ public class Teacher extends javax.swing.JFrame {
         txtemail.setText("");
         txtaddress.setText("");
         txtname.requestFocus();
-    }                                           
 
-    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {                                     
-        // TODO add your handling code here:
-        d = (DefaultTableModel) jTable1.getModel();
-        int selectIndex = jTable1.getSelectedRow();
-        String id = d.getValueAt(selectIndex, 0).toString();
-        txtname.setText(d.getValueAt(selectIndex, 1).toString());
-        txtqualification.setText(d.getValueAt(selectIndex, 2).toString());
-        txtsalary.setText(d.getValueAt(selectIndex, 3).toString());
-        txtmobile.setText(d.getValueAt(selectIndex, 4).toString());
-        txtemail.setText(d.getValueAt(selectIndex, 5).toString());
-        txtaddress.setText(d.getValueAt(selectIndex, 6).toString());
-        savebutton.setEnabled(false);
-    }                                    
-
-    private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {                                    
-        // TODO add your handling code here:
-        Main m = new Main(id, uname, usertype);
-        m.setVisible(true);
-        this.setVisible(false);
-    }                                   
-
-    private void jMenu2MouseClicked(java.awt.event.MouseEvent evt) {                                    
-        // TODO add your handling code here:
-        About a = new About();
-        a.setVisible(true);
-        this.setVisible(false);
-    }                                   
-
-    private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {                                     
-        // TODO add your handling code here:
-        try {
-            // TODO add your handling code here:
-            Desktop.getDesktop().browse(new URI("https://github.com/naveenkumar-j"));
-        } catch (IOException ex) {
-            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }                                    
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Teacher.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Teacher.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Teacher.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Teacher.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Teacher().setVisible(true);
-            }
-        });
+        // Reload the teacher data into the table
+        Teacher_Load();
+    } catch (SQLException ex) {
+        Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
     }
+}                                          
+
+private void editbuttonActionPerformed(java.awt.event.ActionEvent evt) {                                           
+    // Edit teacher details in the database
+    try {
+        d = (DefaultTableModel) jTable1.getModel();
+        int selectIndex = jTable1.getSelectedRow(); // Get the selected row index
+        String id = d.getValueAt(selectIndex, 0).toString(); // Get the ID of the selected teacher
+
+        // Get updated values from input fields
+        String name = txtname.getText();
+        String qualification = txtqualification.getText();
+        String salary = txtsalary.getText();
+        String mobile = txtmobile.getText();
+        String email = txtemail.getText();
+        String address = txtaddress.getText();
+
+        // Prepare and execute the SQL update statement
+        pst = con.prepareStatement("update teacher set name=?,qualification=?,salary=?,phone=?,email=?,address=? where id=?");
+        pst.setString(1, name);
+        pst.setString(2, qualification);
+        pst.setString(3, salary);
+        pst.setString(4, mobile);
+        pst.setString(5, email);
+        pst.setString(6, address);
+        pst.setString(7, id);
+        pst.executeUpdate(); // Execute the query
+
+        // Show success message
+        JOptionPane.showMessageDialog(this, "Teacher details edited successfully...");
+        savebutton.setEnabled(true);
+
+        // Clear input fields and reset focus
+        txtname.setText("");
+        txtqualification.setText("");
+        txtsalary.setText("");
+        txtmobile.setText("");
+        txtemail.setText("");
+        txtaddress.setText("");
+        txtname.requestFocus();
+
+        // Reload the teacher data into the table
+        Teacher_Load();
+    } catch (SQLException ex) {
+        Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+    }
+}                                          
+
+private void deletebuttonActionPerformed(java.awt.event.ActionEvent evt) {                                             
+    // Delete teacher details from the database
+    try {
+        d = (DefaultTableModel) jTable1.getModel();
+        int selectIndex = jTable1.getSelectedRow(); // Get the selected row index
+        String id = d.getValueAt(selectIndex, 0).toString(); // Get the ID of the selected teacher
+
+        // Prepare and execute the SQL delete statement
+        pst = con.prepareStatement("delete from teacher where id=?");
+        pst.setString(1, id);
+        pst.executeUpdate(); // Execute the query
+
+        // Show success message
+        JOptionPane.showMessageDialog(this, "Teacher details deleted successfully...");
+        savebutton.setEnabled(true);
+
+        // Clear input fields
+        txtname.setText("");
+        txtqualification.setText("");
+        txtsalary.setText("");
+        txtmobile.setText("");
+        txtemail.setText("");
+        txtaddress.setText("");
+        txtname.requestFocus();
+
+        // Reload the teacher data into the table
+        Teacher_Load();
+    } catch (SQLException ex) {
+        Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+    }
+}                                            
+
+private void clearbuttonActionPerformed(java.awt.event.ActionEvent evt) {                                            
+    // Clear all input fields
+    txtname.setText("");
+    txtqualification.setText("");
+    txtsalary.setText("");
+    txtmobile.setText("");
+    txtemail.setText("");
+    txtaddress.setText("");
+    txtname.requestFocus(); // Set focus back to the name input field
+}                                           
+
+private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {                                     
+    // Populate input fields with data from the selected row
+    d = (DefaultTableModel) jTable1.getModel();
+    int selectIndex = jTable1.getSelectedRow(); // Get the selected row index
+    txtname.setText(d.getValueAt(selectIndex, 1).toString()); // Teacher name
+    txtqualification.setText(d.getValueAt(selectIndex, 2).toString()); // Qualification
+    txtsalary.setText(d.getValueAt(selectIndex, 3).toString()); // Salary
+    txtmobile.setText(d.getValueAt(selectIndex, 4).toString()); // Mobile number
+    txtemail.setText(d.getValueAt(selectIndex, 5).toString()); // Email
+    txtaddress.setText(d.getValueAt(selectIndex, 6).toString()); // Address
+    savebutton.setEnabled(false); // Disable the save button
+}                                    
+
+private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {                                    
+    // Navigate to the main menu
+    Main m = new Main(id, uname, usertype);
+    m.setVisible(true); // Show the Main menu
+    this.setVisible(false); // Hide the current form
+}                                   
+
+private void jMenu2MouseClicked(java.awt.event.MouseEvent evt) {                                    
+    // Navigate to the About page
+    About a = new About();
+    a.setVisible(true); // Show the About form
+    this.setVisible(false); // Hide the current form
+}                                   
+
+private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {                                     
+    // Open the developer's GitHub page in the default browser
+    try {
+        Desktop.getDesktop().browse(new URI("https://github.com/naveenkumar-j"));
+    } catch (IOException ex) {
+        Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+    } catch (URISyntaxException ex) {
+        Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+    }
+}    
+    
+/**
+ * Main method to launch the Teacher application.
+ *
+ * @param args Command-line arguments (not used in this application)
+ */
+public static void main(String args[]) {
+    /* Set the Nimbus look and feel */
+    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+    /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+     * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+     */
+    try {
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+                javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                break; // Use the Nimbus look and feel
+            }
+        }
+    } catch (ClassNotFoundException ex) {
+        java.util.logging.Logger.getLogger(Teacher.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (InstantiationException ex) {
+        java.util.logging.Logger.getLogger(Teacher.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (IllegalAccessException ex) {
+        java.util.logging.Logger.getLogger(Teacher.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        java.util.logging.Logger.getLogger(Teacher.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    }
+    //</editor-fold>
+
+    /* Create and display the form */
+    java.awt.EventQueue.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+            new Teacher().setVisible(true); // Launch the Teacher page
+        }
+    });
+}
 
     // Variables declaration - do not modify                     
     private javax.swing.JButton clearbutton;
