@@ -1,6 +1,6 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ * Exam.java
+ * This class provides the GUI and functionality for managing exam records in the School Management System.
  */
 package schoolmanagementsystem;
 
@@ -19,7 +19,6 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -28,161 +27,151 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
- *
- * @Lindsay blood
+ * GUI and logic for managing exam records.
+ * Allows for creating, reading, updating, and deleting exam entries.
  */
 public class Exam extends javax.swing.JFrame {
 
+    // Variables for database and user-specific information
+    int id; // User ID
+    String uname; // Username
+    String usertype; // User type (e.g., Admin, Student, Guest)
+
+    Connection con; // Database connection
+    PreparedStatement pst; // PreparedStatement for executing SQL queries
+    ResultSet rs; // ResultSet for query results
+    DefaultTableModel d; // Table model for managing JTable data
+
     /**
-     * Creates new form Exam
+     * Default constructor initializes components and loads data.
      */
     public Exam() {
+        initComponents();
+        Connect(); // Establish connection to the database
+        Class_Load(); // Load available classes into dropdown
+        Section_Load(); // Load available sections into dropdown
+        Subject_Load(); // Load available subjects into dropdown
+        Exam_Load(); // Load existing exam records into table
+        setIconImage(); // Set window icon
+        setTitle("Exam Details"); // Set window title
+    }
+
+    /**
+     * Overloaded constructor for initializing with user information.
+     * @param id User ID
+     * @param username Username
+     * @param utype User type
+     */
+    public Exam(int id, String username, String utype) {
+        setIconImage();
+        setTitle("Exam Details");
         initComponents();
         Connect();
         Class_Load();
         Section_Load();
         Subject_Load();
         Exam_Load();
-        setIconImage();
-        setTitle("Exam details");
-    }
-
-    private void setIconImage() {
-        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png")));
-
-    }
-
-    int id;
-    String uname;
-    String usertype;
-    
-    /**
-     * Method to add exam details in the portal
-     */
-
-    public Exam(int id, String username, String utype) {
-        setIconImage();
-        setTitle("Exam details");
-        initComponents();
-        Connect();
-        Class_Load();
-        Section_Load();
-        Subject_Load();
         this.uname = username;
-        jLabel20.setText(uname);
+        jLabel20.setText(uname); // Display username on UI
         this.usertype = utype;
-        jLabel30.setText(usertype);
+        jLabel30.setText(usertype); // Display user type on UI
         this.id = id;
 
-        if (utype.equals("Student")) {
+        // Enable or disable features based on user type
+        if (utype.equals("Student") || utype.equals("Guest")) {
             savebutton.setEnabled(false);
             editbutton.setEnabled(false);
             deletebutton.setEnabled(false);
             clearbutton.setEnabled(false);
-        }
-
-        if (utype.equals("Guest")) {
-            savebutton.setEnabled(false);
-            editbutton.setEnabled(false);
-            deletebutton.setEnabled(false);
-            clearbutton.setEnabled(false);
-
         } else {
             savebutton.setEnabled(true);
             editbutton.setEnabled(true);
             deletebutton.setEnabled(true);
             clearbutton.setEnabled(true);
         }
-
     }
 
-    Connection con;
-    PreparedStatement pst;
-    ResultSet rs;
-    DefaultTableModel d;
-
-       public void Connect() {
-    try {
-        // Load properties file
-        Properties properties = new Properties();
-        properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
-
-        // Get database details
-        String url = properties.getProperty("db.url");
-        String username = properties.getProperty("db.username");
-        String password = properties.getProperty("db.password");
-
-        // Load database driver
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        con = DriverManager.getConnection(url, username, password);
-        System.out.println("Database connection successful.");
-    } catch (IOException e) {
-        System.out.println("Error loading properties file: " + e.getMessage());
-    } catch (SQLException ex) {
-        Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
-    } catch (ClassNotFoundException ex) {
-        Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-    }
-}
-
-    public void Class_Load() {
-
+    /**
+     * Establishes a connection to the database.
+     */
+    public void Connect() {
         try {
-            pst = con.prepareStatement("select Distinct classname from class");
-            rs = pst.executeQuery();
+            // Load database configuration from properties file
+            Properties properties = new Properties();
+            properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
 
-            //txtclass.removeAllItems();
+            String url = properties.getProperty("db.url"); // Database URL
+            String username = properties.getProperty("db.username"); // Username
+            String password = properties.getProperty("db.password"); // Password
+
+            // Load the database driver and establish connection
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection(url, username, password);
+            System.out.println("Database connection successful.");
+        } catch (IOException | ClassNotFoundException | SQLException ex) {
+            Logger.getLogger(Exam.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Loads available class names from the database into the class dropdown.
+     */
+    public void Class_Load() {
+        try {
+            pst = con.prepareStatement("SELECT DISTINCT classname FROM class");
+            rs = pst.executeQuery();
             while (rs.next()) {
                 txtclass.addItem(rs.getString("classname"));
             }
         } catch (SQLException ex) {
-            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Exam.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    /**
+     * Loads available section names from the database into the section dropdown.
+     */
     public void Section_Load() {
-
         try {
-            pst = con.prepareStatement("select Distinct section from class");
+            pst = con.prepareStatement("SELECT DISTINCT section FROM class");
             rs = pst.executeQuery();
-
-            //txtclass.removeAllItems();
             while (rs.next()) {
                 txtsection.addItem(rs.getString("section"));
             }
         } catch (SQLException ex) {
-            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Exam.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    /**
+     * Loads available subject names from the database into the subject dropdown.
+     */
     public void Subject_Load() {
-
         try {
-            pst = con.prepareStatement("select Distinct subjectname from subject");
+            pst = con.prepareStatement("SELECT DISTINCT subjectname FROM subject");
             rs = pst.executeQuery();
-
-            //txtclass.removeAllItems();
             while (rs.next()) {
                 txtsubject.addItem(rs.getString("subjectname"));
             }
         } catch (SQLException ex) {
-            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Exam.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    /**
+     * Loads all existing exam records into the JTable for display.
+     */
     public void Exam_Load() {
-        int c;
         try {
-            pst = con.prepareStatement("select * from exam");
+            pst = con.prepareStatement("SELECT * FROM exam");
             rs = pst.executeQuery();
-
             ResultSetMetaData rsd = rs.getMetaData();
-            c = rsd.getColumnCount();
+            int c = rsd.getColumnCount(); // Number of columns in the result
 
             d = (DefaultTableModel) jTable1.getModel();
-            d.setRowCount(0);
+            d.setRowCount(0); // Clear existing rows
             while (rs.next()) {
-                Vector v2 = new Vector();
+                Vector<Object> v2 = new Vector<>();
                 for (int i = 1; i <= c; i++) {
                     v2.add(rs.getString("examid"));
                     v2.add(rs.getString("examname"));
@@ -191,20 +180,17 @@ public class Exam extends javax.swing.JFrame {
                     v2.add(rs.getString("examclass"));
                     v2.add(rs.getString("examsection"));
                     v2.add(rs.getString("examsubject"));
-
                 }
                 d.addRow(v2);
             }
         } catch (SQLException ex) {
-            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Exam.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 
     /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
+     * Automatically generated method to initialize all components in the UI.
+     * Includes labels, buttons, panels, and other GUI elements.
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
