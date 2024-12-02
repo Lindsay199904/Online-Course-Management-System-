@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package schoolmanagementsystem;
 
 import java.awt.Toolkit;
@@ -24,62 +20,62 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
- *
+ * Handles the Student management page in the School Management System.
+ * Provides functionalities to load, add, edit, and delete student details.
+ * 
  * @Lindsay blood
  */
 public class Student extends javax.swing.JFrame {
 
     /**
-     * Creates new form Student
+     * Default constructor to initialize the student management page.
      */
     public Student() {
-        initComponents();
-        Connect();
-        Class_Load();
-        Section_Load();
-        Student_Load();
-        setIconImage();
-        setTitle("Student page");
+        initComponents(); // Initialize UI components
+        Connect(); // Establish a database connection
+        Class_Load(); // Load class data into the dropdown
+        Section_Load(); // Load section data into the dropdown
+        Student_Load(); // Load student details into the table
+        setIconImage(); // Set the application icon
+        setTitle("Student page"); // Set the window title
     }
 
+    // Method to set the application icon
     private void setIconImage() {
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png")));
-
     }
 
+    // Variables to store user and session details
     int id;
     String uname;
     String usertype;
-/**
-     * Method to add student details to the db
+
+    /**
+     * Overloaded constructor to initialize the page with user-specific details.
+     * Sets up permissions based on the user type.
      */
     public Student(int id, String username, String utype) {
-        initComponents();
-        Connect();
-        Class_Load();
-        Section_Load();
-        Student_Load();
-        setIconImage();
-        setTitle("Student page");
+        initComponents(); // Initialize UI components
+        Connect(); // Establish database connection
+        Class_Load(); // Load class data
+        Section_Load(); // Load section data
+        Student_Load(); // Load student details
+        setIconImage(); // Set the application icon
+        setTitle("Student page"); // Set the window title
+
+        // Assign user details
         this.uname = username;
         jLabel20.setText(uname);
 
         this.usertype = utype;
         jLabel21.setText(utype);
 
-        if (utype.equals("Student")) {
+        // Adjust button permissions based on user type
+        if (utype.equals("Student") || utype.equals("Guest")) {
             savebutton.setEnabled(false);
             editbutton.setEnabled(false);
             deletebutton.setEnabled(false);
             clearbutton.setEnabled(false);
-        }
-
-        if (utype.equals("Guest")) {
-            savebutton.setEnabled(false);
-            editbutton.setEnabled(false);
-            deletebutton.setEnabled(false);
-            clearbutton.setEnabled(false);
-
         } else {
             savebutton.setEnabled(true);
             editbutton.setEnabled(true);
@@ -87,46 +83,54 @@ public class Student extends javax.swing.JFrame {
             clearbutton.setEnabled(true);
         }
 
-        this.id = id;
-
+        this.id = id; // Store user ID
     }
 
+    // Variables for database connection and operations
     Connection con;
     PreparedStatement pst;
     ResultSet rs;
     DefaultTableModel d;
 
-       public void Connect() {
-    try {
-        // Load properties file
-        Properties properties = new Properties();
-        properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
-
-        // Get database details
-        String url = properties.getProperty("db.url");
-        String username = properties.getProperty("db.username");
-        String password = properties.getProperty("db.password");
-
-        // Load database driver
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        con = DriverManager.getConnection(url, username, password);
-        System.out.println("Database connection successful.");
-    } catch (IOException e) {
-        System.out.println("Error loading properties file: " + e.getMessage());
-    } catch (SQLException ex) {
-        Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
-    } catch (ClassNotFoundException ex) {
-        Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-    }
-}
-
-    public void Class_Load() {
-
+    /**
+     * Establishes a connection to the database using a properties file for configuration.
+     */
+    public void Connect() {
         try {
+            // Load properties file containing database configuration
+            Properties properties = new Properties();
+            properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
+
+            // Retrieve database connection details
+            String url = properties.getProperty("db.url");
+            String username = properties.getProperty("db.username");
+            String password = properties.getProperty("db.password");
+
+            // Load and initialize the database driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Establish the connection
+            con = DriverManager.getConnection(url, username, password);
+            System.out.println("Database connection successful.");
+        } catch (IOException e) {
+            System.out.println("Error loading properties file: " + e.getMessage());
+        } catch (SQLException ex) {
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Loads class names from the database into the class dropdown.
+     */
+    public void Class_Load() {
+        try {
+            // Query to fetch distinct class names
             pst = con.prepareStatement("select Distinct classname from class");
             rs = pst.executeQuery();
 
-            //txtclass.removeAllItems();
+            // Populate the class dropdown
             while (rs.next()) {
                 txtclass.addItem(rs.getString("classname"));
             }
@@ -135,13 +139,16 @@ public class Student extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Loads section names from the database into the section dropdown.
+     */
     public void Section_Load() {
-
         try {
+            // Query to fetch distinct section names
             pst = con.prepareStatement("select Distinct section from class");
             rs = pst.executeQuery();
 
-            //txtclass.removeAllItems();
+            // Populate the section dropdown
             while (rs.next()) {
                 txtsection.addItem(rs.getString("section"));
             }
@@ -150,17 +157,25 @@ public class Student extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Loads student details from the database into the table.
+     */
     public void Student_Load() {
-        int c;
+        int c; // Column count
         try {
+            // Query to fetch all student details
             pst = con.prepareStatement("select * from student");
             rs = pst.executeQuery();
 
+            // Get metadata to determine the number of columns
             ResultSetMetaData rsd = rs.getMetaData();
             c = rsd.getColumnCount();
 
+            // Prepare the table model
             d = (DefaultTableModel) rSTableMetro1.getModel();
-            d.setRowCount(0);
+            d.setRowCount(0); // Clear existing rows
+
+            // Populate the table with data
             while (rs.next()) {
                 Vector v2 = new Vector();
                 for (int i = 1; i <= c; i++) {
@@ -179,7 +194,6 @@ public class Student extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 
     /**
@@ -626,66 +640,74 @@ public class Student extends javax.swing.JFrame {
         }
     }                                          
 
-    private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {                                    
-        // TODO add your handling code here:
-        Main m = new Main(id, uname, usertype);
-        m.setVisible(true);
-        this.setVisible(false);
-    }                                   
+   private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {                                    
+    // Handles the event when the "Main Menu" option is clicked in the menu bar.
+    // Navigates to the Main menu window and closes the current Student window.
+    Main m = new Main(id, uname, usertype); // Create a new instance of the Main class with user details
+    m.setVisible(true); // Make the Main window visible
+    this.setVisible(false); // Hide the current Student window
+}                                   
 
-    private void jMenu2MouseClicked(java.awt.event.MouseEvent evt) {                                    
-        // TODO add your handling code here:
-        About a = new About();
-        a.setVisible(true);
-        this.setVisible(false);
-    }                                   
+private void jMenu2MouseClicked(java.awt.event.MouseEvent evt) {                                    
+    // Handles the event when the "About Project" option is clicked in the menu bar.
+    // Opens the About page and closes the current Student window.
+    About a = new About(); // Create a new instance of the About class
+    a.setVisible(true); // Display the About window
+    this.setVisible(false); // Hide the current Student window
+}                                   
 
-    private void jLabel14MouseClicked(java.awt.event.MouseEvent evt) {                                      
-        // TODO add your handling code here:
-        Login l = new Login();
-        l.setVisible(true);
-        this.setVisible(false);
-    }                                     
+private void jLabel14MouseClicked(java.awt.event.MouseEvent evt) {                                      
+    // Handles the event when the logout label (jLabel14) is clicked.
+    // Logs out the user by navigating to the Login page and closing the current window.
+    Login l = new Login(); // Create a new instance of the Login class
+    l.setVisible(true); // Display the Login window
+    this.setVisible(false); // Hide the current Student window
+}                                     
 
-    private void jMenu1ActionPerformed(java.awt.event.ActionEvent evt) {                                       
-        // TODO add your handling code here:
+private void jMenu1ActionPerformed(java.awt.event.ActionEvent evt) {                                       
+    // Placeholder method for handling additional actions on the "Main Menu" menu item.
+    // Currently, this does not perform any specific operation.
+}                                      
 
-    }                                      
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+/**
+ * Main method to start the application.
+ *
+ * @param args the command line arguments
+ */
+public static void main(String args[]) {
+    /* Set the Nimbus look and feel */
+    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+    try {
+        // Iterates through installed Look and Feel options to set "Nimbus" if available.
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+                javax.swing.UIManager.setLookAndFeel(info.getClassName()); // Set the Nimbus Look and Feel
+                break; // Exit loop once Nimbus is set
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Student.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Student.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Student.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Student.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Student().setVisible(true);
-            }
-        });
+    } catch (ClassNotFoundException ex) {
+        // Log an error if the Look and Feel class is not found
+        java.util.logging.Logger.getLogger(Student.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (InstantiationException ex) {
+        // Log an error if the Look and Feel class cannot be instantiated
+        java.util.logging.Logger.getLogger(Student.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (IllegalAccessException ex) {
+        // Log an error if the Look and Feel class cannot be accessed
+        java.util.logging.Logger.getLogger(Student.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        // Log an error if the Look and Feel class is unsupported
+        java.util.logging.Logger.getLogger(Student.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
     }
+    //</editor-fold>
+
+    /* Create and display the form */
+    java.awt.EventQueue.invokeLater(new Runnable() {
+        public void run() {
+            new Student().setVisible(true); // Instantiate and display the Student form
+        }
+    });
+}
+
 
     // Variables declaration - do not modify                     
     private javax.swing.JButton clearbutton;
