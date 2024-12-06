@@ -168,7 +168,7 @@ public class Login extends javax.swing.JFrame {
 
         // User type dropdown
         txtutype.setFont(new java.awt.Font("Calibri", 0, 18));
-        txtutype.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select", "Admin", "Teacher", "Student", "Guest" }));
+        txtutype.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select", "Admin", "Teacher", "Student" }));
         txtutype.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 51)));
         txtutype.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jPanel1.add(txtutype, new org.netbeans.lib.awtextra.AbsoluteConstraints(548, 334, 263, 35));
