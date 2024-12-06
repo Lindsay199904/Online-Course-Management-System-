@@ -1,6 +1,6 @@
 /*
- * Exam.java
- * This class provides the GUI and functionality for managing exam records in the School Management System.
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package schoolmanagementsystem;
 
@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -27,151 +28,165 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * GUI and logic for managing exam records.
- * Allows for creating, reading, updating, and deleting exam entries.
+ *
+ * @Lindsay blood
  */
 public class Exam extends javax.swing.JFrame {
 
-    // Variables for database and user-specific information
-    int id; // User ID
-    String uname; // Username
-    String usertype; // User type (e.g., Admin, Student, Guest)
-
-    Connection con; // Database connection
-    PreparedStatement pst; // PreparedStatement for executing SQL queries
-    ResultSet rs; // ResultSet for query results
-    DefaultTableModel d; // Table model for managing JTable data
-
     /**
-     * Default constructor initializes components and loads data.
+     * Creates new form Exam
      */
     public Exam() {
-        initComponents();
-        Connect(); // Establish connection to the database
-        Class_Load(); // Load available classes into dropdown
-        Section_Load(); // Load available sections into dropdown
-        Subject_Load(); // Load available subjects into dropdown
-        Exam_Load(); // Load existing exam records into table
-        setIconImage(); // Set window icon
-        setTitle("Exam Details"); // Set window title
-    }
-
-    /**
-     * Overloaded constructor for initializing with user information.
-     * @param id User ID
-     * @param username Username
-     * @param utype User type
-     */
-    public Exam(int id, String username, String utype) {
-        setIconImage();
-        setTitle("Exam Details");
         initComponents();
         Connect();
         Class_Load();
         Section_Load();
         Subject_Load();
         Exam_Load();
+        setIconImage();
+        setTitle("Exam details");
+    }
+
+    private void setIconImage() {
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png")));
+
+    }
+
+    int id;
+    String uname;
+    String usertype;
+    
+    /**
+     * Method to add exam details in the portal
+     */
+
+    public Exam(int id, String username, String utype) {
+        setIconImage();
+        setTitle("Exam details");
+        initComponents();
+        Connect();
+        Class_Load();
+        Section_Load();
+        Subject_Load();
         this.uname = username;
-        jLabel20.setText(uname); // Display username on UI
+        jLabel20.setText(uname);
         this.usertype = utype;
-        jLabel30.setText(usertype); // Display user type on UI
+        jLabel30.setText(usertype);
         this.id = id;
 
-        // Enable or disable features based on user type
-        if (utype.equals("Student") || utype.equals("Guest")) {
-            savebutton.setEnabled(false);
-            editbutton.setEnabled(false);
-            deletebutton.setEnabled(false);
-            clearbutton.setEnabled(false);
-        } else {
-            savebutton.setEnabled(true);
-            editbutton.setEnabled(true);
-            deletebutton.setEnabled(true);
-            clearbutton.setEnabled(true);
-        }
+        // Disable buttons and fields for "Student" and "Guest" roles
+    if (utype.equals("Student") || utype.equals("Guest")) {
+        savebutton.setEnabled(false);
+        editbutton.setEnabled(false);
+        deletebutton.setEnabled(false);
+        clearbutton.setEnabled(false);
+
+        // Disable input fields to prevent manual changes
+        txtename.setEditable(false);
+        txtdate.setEnabled(false); // DateChooser requires `setEnabled`
+        txtclass.setEnabled(false);
+        txtsection.setEnabled(false);
+        txtsubject.setEnabled(false);
+        txtterm.setEnabled(false);
+
+        // Show read-only access message
+        JOptionPane.showMessageDialog(this, "You have read-only access to this page.");
+    } else {
+        // Enable buttons for other roles (e.g., Admin, Teacher)
+        savebutton.setEnabled(true);
+        editbutton.setEnabled(true);
+        deletebutton.setEnabled(true);
+        clearbutton.setEnabled(true);
     }
+}
 
-    /**
-     * Establishes a connection to the database.
-     */
-    public void Connect() {
-        try {
-            // Load database configuration from properties file
-            Properties properties = new Properties();
-            properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
+    Connection con;
+    PreparedStatement pst;
+    ResultSet rs;
+    DefaultTableModel d;
 
-            String url = properties.getProperty("db.url"); // Database URL
-            String username = properties.getProperty("db.username"); // Username
-            String password = properties.getProperty("db.password"); // Password
+       public void Connect() {
+    try {
+        // Load properties file
+        Properties properties = new Properties();
+        properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
 
-            // Load the database driver and establish connection
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            con = DriverManager.getConnection(url, username, password);
-            System.out.println("Database connection successful.");
-        } catch (IOException | ClassNotFoundException | SQLException ex) {
-            Logger.getLogger(Exam.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        // Get database details
+        String url = properties.getProperty("db.url");
+        String username = properties.getProperty("db.username");
+        String password = properties.getProperty("db.password");
+
+        // Load database driver
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        con = DriverManager.getConnection(url, username, password);
+        System.out.println("Database connection successful.");
+    } catch (IOException e) {
+        System.out.println("Error loading properties file: " + e.getMessage());
+    } catch (SQLException ex) {
+        Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+    } catch (ClassNotFoundException ex) {
+        Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
     }
+}
 
-    /**
-     * Loads available class names from the database into the class dropdown.
-     */
     public void Class_Load() {
+
         try {
-            pst = con.prepareStatement("SELECT DISTINCT classname FROM class");
+            pst = con.prepareStatement("select Distinct classname from class");
             rs = pst.executeQuery();
+
+            //txtclass.removeAllItems();
             while (rs.next()) {
                 txtclass.addItem(rs.getString("classname"));
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Exam.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    /**
-     * Loads available section names from the database into the section dropdown.
-     */
     public void Section_Load() {
+
         try {
-            pst = con.prepareStatement("SELECT DISTINCT section FROM class");
+            pst = con.prepareStatement("select Distinct section from class");
             rs = pst.executeQuery();
+
+            //txtclass.removeAllItems();
             while (rs.next()) {
                 txtsection.addItem(rs.getString("section"));
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Exam.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    /**
-     * Loads available subject names from the database into the subject dropdown.
-     */
     public void Subject_Load() {
+
         try {
-            pst = con.prepareStatement("SELECT DISTINCT subjectname FROM subject");
+            pst = con.prepareStatement("select Distinct subjectname from subject");
             rs = pst.executeQuery();
+
+            //txtclass.removeAllItems();
             while (rs.next()) {
                 txtsubject.addItem(rs.getString("subjectname"));
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Exam.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    /**
-     * Loads all existing exam records into the JTable for display.
-     */
     public void Exam_Load() {
+        int c;
         try {
-            pst = con.prepareStatement("SELECT * FROM exam");
+            pst = con.prepareStatement("select * from exam");
             rs = pst.executeQuery();
+
             ResultSetMetaData rsd = rs.getMetaData();
-            int c = rsd.getColumnCount(); // Number of columns in the result
+            c = rsd.getColumnCount();
 
             d = (DefaultTableModel) jTable1.getModel();
-            d.setRowCount(0); // Clear existing rows
+            d.setRowCount(0);
             while (rs.next()) {
-                Vector<Object> v2 = new Vector<>();
+                Vector v2 = new Vector();
                 for (int i = 1; i <= c; i++) {
                     v2.add(rs.getString("examid"));
                     v2.add(rs.getString("examname"));
@@ -180,20 +195,23 @@ public class Exam extends javax.swing.JFrame {
                     v2.add(rs.getString("examclass"));
                     v2.add(rs.getString("examsection"));
                     v2.add(rs.getString("examsubject"));
+
                 }
                 d.addRow(v2);
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Exam.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
+
     }
 
     /**
-     * Automatically generated method to initialize all components in the UI.
-     * Includes labels, buttons, panels, and other GUI elements.
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
@@ -456,13 +474,13 @@ public class Exam extends javax.swing.JFrame {
 
         pack();
         setLocationRelativeTo(null);
-    }// </editor-fold>                        
+    }// </editor-fold>//GEN-END:initComponents
 
-    private void txtclassActionPerformed(java.awt.event.ActionEvent evt) {                                         
+    private void txtclassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtclassActionPerformed
         // TODO add your handling code here:
-    }                                        
+    }//GEN-LAST:event_txtclassActionPerformed
 
-    private void savebuttonActionPerformed(java.awt.event.ActionEvent evt) {                                           
+    private void savebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savebuttonActionPerformed
         // TODO add your handling code here:
         try {
             // TODO add your handling code here:
@@ -488,9 +506,9 @@ public class Exam extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }                                          
+    }//GEN-LAST:event_savebuttonActionPerformed
 
-    private void deletebuttonActionPerformed(java.awt.event.ActionEvent evt) {                                             
+    private void deletebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deletebuttonActionPerformed
         // TODO add your handling code here:
         try {
             // TODO add your handling code here:
@@ -518,9 +536,9 @@ public class Exam extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }                                            
+    }//GEN-LAST:event_deletebuttonActionPerformed
 
-    private void editbuttonActionPerformed(java.awt.event.ActionEvent evt) {                                           
+    private void editbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editbuttonActionPerformed
         // TODO add your handling code here:
         try {
             // TODO add your handling code here:
@@ -562,13 +580,13 @@ public class Exam extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }                                          
+    }//GEN-LAST:event_editbuttonActionPerformed
 
-    private void txtenameActionPerformed(java.awt.event.ActionEvent evt) {                                         
+    private void txtenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtenameActionPerformed
         // TODO add your handling code here:
-    }                                        
+    }//GEN-LAST:event_txtenameActionPerformed
 
-    private void clearbuttonActionPerformed(java.awt.event.ActionEvent evt) {                                            
+    private void clearbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearbuttonActionPerformed
         // TODO add your handling code here:
         txtename.setText("");
         txtdate.setDate(null);
@@ -577,23 +595,23 @@ public class Exam extends javax.swing.JFrame {
         txtsubject.setSelectedIndex(0);
         txtterm.setSelectedIndex(0);
         savebutton.setEnabled(true);
-    }                                           
+    }//GEN-LAST:event_clearbuttonActionPerformed
 
-    private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {                                    
+    private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu1MouseClicked
         // TODO add your handling code here:
         Main m = new Main(id, uname, usertype);
         m.setVisible(true);
         this.setVisible(false);
-    }                                   
+    }//GEN-LAST:event_jMenu1MouseClicked
 
-    private void jMenu2MouseClicked(java.awt.event.MouseEvent evt) {                                    
+    private void jMenu2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu2MouseClicked
         // TODO add your handling code here:
         About a = new About();
         a.setVisible(true);
         this.setVisible(false);
-    }                                   
+    }//GEN-LAST:event_jMenu2MouseClicked
 
-    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {                                     
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         // TODO add your handling code here:
         try {
             // TODO add your handling code here:
@@ -613,9 +631,9 @@ public class Exam extends javax.swing.JFrame {
         } catch (ParseException ex) {
             Logger.getLogger(Exam.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }                                    
+    }//GEN-LAST:event_jTable1MouseClicked
 
-    private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {                                     
+    private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseClicked
         // TODO add your handling code here:
         try {
             // TODO add your handling code here:
@@ -625,14 +643,14 @@ public class Exam extends javax.swing.JFrame {
         } catch (URISyntaxException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }                                    
+    }//GEN-LAST:event_jLabel9MouseClicked
 
-    private void jLabel10MouseClicked(java.awt.event.MouseEvent evt) {                                      
+    private void jLabel10MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel10MouseClicked
         // TODO add your handling code here:
         Login l = new Login();
         l.setVisible(true);
         this.setVisible(false);
-    }                                     
+    }//GEN-LAST:event_jLabel10MouseClicked
 
     /**
      * @param args the command line arguments
@@ -669,7 +687,7 @@ public class Exam extends javax.swing.JFrame {
         });
     }
 
-    // Variables declaration - do not modify                     
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton clearbutton;
     private javax.swing.JButton deletebutton;
     private javax.swing.JButton editbutton;
@@ -703,5 +721,5 @@ public class Exam extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> txtsection;
     private javax.swing.JComboBox<String> txtsubject;
     private javax.swing.JComboBox<String> txtterm;
-    // End of variables declaration                   
+    // End of variables declaration//GEN-END:variables
 }
