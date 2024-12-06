@@ -37,105 +37,112 @@ public class Exam extends javax.swing.JFrame {
      * Creates new form Exam
      */
     public Exam() {
-        initComponents();
-        Connect();
-        Class_Load();
-        Section_Load();
-        Subject_Load();
-        Exam_Load();
-        setIconImage();
-        setTitle("Exam details");
+        initComponents(); // Initialize the UI components
+        Connect(); // Establish a database connection
+        Class_Load(); // Load class data into dropdown
+        Section_Load(); // Load section data into dropdown
+        Subject_Load(); // Load subject data into dropdown
+        Exam_Load(); // Load existing exam data into the table
+        setIconImage(); // Set the window icon
+        setTitle("Exam details"); // Set the window title
     }
 
     private void setIconImage() {
-        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png")));
-
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png"))); // Set the app logo
     }
 
-    int id;
-    String uname;
-    String usertype;
-    
+    int id; // User ID
+    String uname; // Username
+    String usertype; // User type (e.g., Admin, Student, etc.)
+
     /**
-     * Method to add exam details in the portal
+     * Overloaded constructor to add exam details and set up role-based access
      */
+    public Exam(int id, String username, String utype) {
+        setIconImage(); // Set the app logo
+        setTitle("Exam details"); // Set the window title
+        initComponents(); // Initialize UI components
+        Connect(); // Establish database connection
+        Class_Load(); // Load class data into dropdown
+        Section_Load(); // Load section data into dropdown
+        Subject_Load(); // Load subject data into dropdown
+        Exam_Load(); // Load existing exam data into the table
 
-   public Exam(int id, String username, String utype) {
-    setIconImage();
-    setTitle("Exam details");
-    initComponents();
-    Connect();
-    Class_Load();
-    Section_Load();
-    Subject_Load();
-    Exam_Load(); // Add this to load exam data immediately
-    this.uname = username;
-    jLabel20.setText(uname);
-    this.usertype = utype;
-    jLabel30.setText(usertype);
-    this.id = id;
+        // Set the user-related details
+        this.uname = username;
+        jLabel20.setText(uname); // Display username in UI
+        this.usertype = utype;
+        jLabel30.setText(usertype); // Display user type in UI
+        this.id = id;
 
-    // Disable buttons and fields for "Student" and "Guest" roles
-    if (utype.equals("Student") || utype.equals("Guest")) {
-        savebutton.setEnabled(false);
-        editbutton.setEnabled(false);
-        deletebutton.setEnabled(false);
-        clearbutton.setEnabled(false);
+        // Restrict or allow actions based on user type
+        if (utype.equals("Student") || utype.equals("Guest")) {
+            // Disable buttons for non-privileged users
+            savebutton.setEnabled(false);
+            editbutton.setEnabled(false);
+            deletebutton.setEnabled(false);
+            clearbutton.setEnabled(false);
 
-        // Disable input fields to prevent manual changes
-        txtename.setEditable(false);
-        txtdate.setEnabled(false);
-        txtclass.setEnabled(false);
-        txtsection.setEnabled(false);
-        txtsubject.setEnabled(false);
-        txtterm.setEnabled(false);
+            // Disable input fields to prevent manual edits
+            txtename.setEditable(false);
+            txtdate.setEnabled(false);
+            txtclass.setEnabled(false);
+            txtsection.setEnabled(false);
+            txtsubject.setEnabled(false);
+            txtterm.setEnabled(false);
 
-        // Show read-only access message
-        JOptionPane.showMessageDialog(this, "You have read-only access to this page.");
-    } else {
-        savebutton.setEnabled(true);
-        editbutton.setEnabled(true);
-        deletebutton.setEnabled(true);
-        clearbutton.setEnabled(true);
+            // Show a message indicating read-only access
+            JOptionPane.showMessageDialog(this, "You have read-only access to this page.");
+        } else {
+            // Enable all buttons for privileged users (e.g., Admin, Teacher)
+            savebutton.setEnabled(true);
+            editbutton.setEnabled(true);
+            deletebutton.setEnabled(true);
+            clearbutton.setEnabled(true);
+        }
     }
-}
 
-    Connection con;
-    PreparedStatement pst;
-    ResultSet rs;
-    DefaultTableModel d;
+    Connection con; // Database connection object
+    PreparedStatement pst; // Statement for executing SQL queries
+    ResultSet rs; // Result set for storing query results
+    DefaultTableModel d; // Table model for displaying data in the UI
 
-       public void Connect() {
-    try {
-        // Load properties file
-        Properties properties = new Properties();
-        properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
-
-        // Get database details
-        String url = properties.getProperty("db.url");
-        String username = properties.getProperty("db.username");
-        String password = properties.getProperty("db.password");
-
-        // Load database driver
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        con = DriverManager.getConnection(url, username, password);
-        System.out.println("Database connection successful.");
-    } catch (IOException e) {
-        System.out.println("Error loading properties file: " + e.getMessage());
-    } catch (SQLException ex) {
-        Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
-    } catch (ClassNotFoundException ex) {
-        Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-    }
-}
-
-    public void Class_Load() {
-
+    /**
+     * Method to establish database connection
+     */
+    public void Connect() {
         try {
-            pst = con.prepareStatement("select Distinct classname from class");
+            // Load the properties file containing database configurations
+            Properties properties = new Properties();
+            properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
+
+            // Retrieve database connection details from properties
+            String url = properties.getProperty("db.url");
+            String username = properties.getProperty("db.username");
+            String password = properties.getProperty("db.password");
+
+            // Load the JDBC driver and connect to the database
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection(url, username, password);
+            System.out.println("Database connection successful.");
+        } catch (IOException e) {
+            System.out.println("Error loading properties file: " + e.getMessage());
+        } catch (SQLException ex) {
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Method to load class data into the dropdown
+     */
+    public void Class_Load() {
+        try {
+            pst = con.prepareStatement("SELECT DISTINCT classname FROM class");
             rs = pst.executeQuery();
 
-            //txtclass.removeAllItems();
+            // Populate dropdown with class names
             while (rs.next()) {
                 txtclass.addItem(rs.getString("classname"));
             }
@@ -144,13 +151,15 @@ public class Exam extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Method to load section data into the dropdown
+     */
     public void Section_Load() {
-
         try {
-            pst = con.prepareStatement("select Distinct section from class");
+            pst = con.prepareStatement("SELECT DISTINCT section FROM class");
             rs = pst.executeQuery();
 
-            //txtclass.removeAllItems();
+            // Populate dropdown with section names
             while (rs.next()) {
                 txtsection.addItem(rs.getString("section"));
             }
@@ -159,13 +168,15 @@ public class Exam extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Method to load subject data into the dropdown
+     */
     public void Subject_Load() {
-
         try {
-            pst = con.prepareStatement("select Distinct subjectname from subject");
+            pst = con.prepareStatement("SELECT DISTINCT subjectname FROM subject");
             rs = pst.executeQuery();
 
-            //txtclass.removeAllItems();
+            // Populate dropdown with subject names
             while (rs.next()) {
                 txtsubject.addItem(rs.getString("subjectname"));
             }
@@ -174,38 +185,42 @@ public class Exam extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Method to load all exam details into the table
+     */
     public void Exam_Load() {
-    int c;
-    try {
-        // Prepare query to fetch all exam data
-        pst = con.prepareStatement("SELECT * FROM exam");
-        rs = pst.executeQuery();
+        int c; // Number of columns
+        try {
+            // Query to retrieve all exam details
+            pst = con.prepareStatement("SELECT * FROM exam");
+            rs = pst.executeQuery();
 
-        // Get column metadata
-        ResultSetMetaData rsd = rs.getMetaData();
-        c = rsd.getColumnCount();
+            // Get metadata for the result set
+            ResultSetMetaData rsd = rs.getMetaData();
+            c = rsd.getColumnCount();
 
-        // Clear the table model
-        d = (DefaultTableModel) jTable1.getModel();
-        d.setRowCount(0);
+            // Initialize the table model and clear existing data
+            d = (DefaultTableModel) jTable1.getModel();
+            d.setRowCount(0);
 
-        // Populate the table with data
-        while (rs.next()) {
-            Vector v2 = new Vector();
-            for (int i = 1; i <= c; i++) {
-                v2.add(rs.getString("examid"));
-                v2.add(rs.getString("examname"));
-                v2.add(rs.getString("examterm"));
-                v2.add(rs.getString("examdate"));
-                v2.add(rs.getString("examclass"));
-                v2.add(rs.getString("examsection"));
-                v2.add(rs.getString("examsubject"));
+            // Populate table rows with exam details
+            while (rs.next()) {
+                Vector v2 = new Vector();
+                for (int i = 1; i <= c; i++) {
+                    v2.add(rs.getString("examid")); // Add exam ID
+                    v2.add(rs.getString("examname")); // Add exam name
+                    v2.add(rs.getString("examterm")); // Add exam term
+                    v2.add(rs.getString("examdate")); // Add exam date
+                    v2.add(rs.getString("examclass")); // Add exam class
+                    v2.add(rs.getString("examsection")); // Add exam section
+                    v2.add(rs.getString("examsubject")); // Add exam subject
+                }
+                d.addRow(v2); // Add the row to the table
             }
-            d.addRow(v2);
+        } catch (SQLException ex) {
+            Logger.getLogger(Exam.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Error loading exam details: " + ex.getMessage());
         }
-    } catch (SQLException ex) {
-        Logger.getLogger(Exam.class.getName()).log(Level.SEVERE, null, ex);
-        JOptionPane.showMessageDialog(this, "Error loading exam details: " + ex.getMessage());
     }
 }
 
