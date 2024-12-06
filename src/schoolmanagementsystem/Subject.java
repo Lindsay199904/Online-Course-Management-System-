@@ -30,108 +30,97 @@ import javax.swing.table.DefaultTableModel;
 public class Subject extends javax.swing.JFrame {
 
     /**
-     * Creates new form TestSubject
+     * Constructor with user details to manage role-based access
      */
-    public Subject() {
-        initComponents();
-        Connect();
-        Subject_Load();
-        setIconImage();
-        setTitle("Subject page");
-    }
-
-    private void setIconImage() {
-        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png")));
-
-    }
-
-    int id;
-    String uname;
-    String usertype;
-    
-    /**
-     * Method to add subject info and assign it to class and student
-     */
-
     public Subject(int id, String username, String utype) {
-        setIconImage();
-        setTitle("Subject page");
-        initComponents();
-        Connect();
-        Subject_Load();
+        setIconImage(); // Set the application icon
+        setTitle("Subject page"); // Set the title of the page
+        initComponents(); // Initialize UI components
+        Connect(); // Establish database connection
+        Subject_Load(); // Load subject data into the table
+
+        // Set user details for display
         this.uname = username;
-        jLabel20.setText(uname);
+        jLabel20.setText(uname); // Display the username in the UI
 
         this.usertype = utype;
-        jLabel30.setText(utype);
+        jLabel30.setText(utype); // Display the user type in the UI
 
         this.id = id;
-       // Disable editing for students
-    if (utype.equals("Student")) {
-        savebutton.setEnabled(false);
-        editbutton.setEnabled(false);
-        deletebutton.setEnabled(false);
-        clearbutton.setEnabled(false);
+
+        // Disable editing for students
+        if (utype.equals("Student")) {
+            savebutton.setEnabled(false); // Disable save button
+            editbutton.setEnabled(false); // Disable edit button
+            deletebutton.setEnabled(false); // Disable delete button
+            clearbutton.setEnabled(false); // Disable clear button
+        }
+
+        // Enable editing for Admins and Teachers
+        if (utype.equals("Admin") || utype.equals("Teacher")) {
+            savebutton.setEnabled(true); // Enable save button
+            editbutton.setEnabled(true); // Enable edit button
+            deletebutton.setEnabled(true); // Enable delete button
+            clearbutton.setEnabled(true); // Enable clear button
+        }
     }
 
-    // Enable editing for non-students
-    if (utype.equals("Admin") || utype.equals("Teacher")) {
-        savebutton.setEnabled(true);
-        editbutton.setEnabled(true);
-        deletebutton.setEnabled(true);
-        clearbutton.setEnabled(true);
-    }
-}
+    Connection con; // Database connection object
+    PreparedStatement pst; // Statement object for executing SQL queries
+    ResultSet rs; // Result set for storing query results
+    DefaultTableModel d; // Table model for displaying data in the UI
 
-    Connection con;
-    PreparedStatement pst;
-    ResultSet rs;
-    DefaultTableModel d;
-
-      public void Connect() {
-    try {
-        // Load properties file
-        Properties properties = new Properties();
-        properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
-
-        // Get database details
-        String url = properties.getProperty("db.url");
-        String username = properties.getProperty("db.username");
-        String password = properties.getProperty("db.password");
-
-        // Load database driver
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        con = DriverManager.getConnection(url, username, password);
-        System.out.println("Database connection successful.");
-    } catch (IOException e) {
-        System.out.println("Error loading properties file: " + e.getMessage());
-    } catch (SQLException ex) {
-        Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
-    } catch (ClassNotFoundException ex) {
-        Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-    }
-}
-
-    public void Subject_Load() {
-        int c;
+    /**
+     * Method to establish a database connection
+     */
+    public void Connect() {
         try {
-            pst = con.prepareStatement("select * from subject");
+            // Load properties file containing database configurations
+            Properties properties = new Properties();
+            properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
+
+            // Retrieve database connection details from properties
+            String url = properties.getProperty("db.url");
+            String username = properties.getProperty("db.username");
+            String password = properties.getProperty("db.password");
+
+            // Load the JDBC driver and connect to the database
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection(url, username, password);
+            System.out.println("Database connection successful.");
+        } catch (IOException e) {
+            System.out.println("Error loading properties file: " + e.getMessage());
+        } catch (SQLException ex) {
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Method to load subject data into the table
+     */
+    public void Subject_Load() {
+        int c; // Variable to hold the number of columns
+        try {
+            pst = con.prepareStatement("SELECT * FROM subject"); // Query to fetch all subject data
             rs = pst.executeQuery();
 
-            ResultSetMetaData rsd = rs.getMetaData();
-            c = rsd.getColumnCount();
+            ResultSetMetaData rsd = rs.getMetaData(); // Get metadata of the result set
+            c = rsd.getColumnCount(); // Get the number of columns
 
-            d = (DefaultTableModel) jTable1.getModel();
-            d.setRowCount(0);
+            d = (DefaultTableModel) jTable1.getModel(); // Get the table model
+            d.setRowCount(0); // Clear any existing rows in the table
+
+            // Iterate through the result set and populate the table
             while (rs.next()) {
-                Vector v2 = new Vector();
+                Vector v2 = new Vector(); // Create a new vector for each row
                 for (int i = 1; i <= c; i++) {
-                    v2.add(rs.getString("id"));
-                    v2.add(rs.getString("subjectcode"));
-                    v2.add(rs.getString("subjectname"));
-
+                    v2.add(rs.getString("id")); // Add subject ID
+                    v2.add(rs.getString("subjectcode")); // Add subject code
+                    v2.add(rs.getString("subjectname")); // Add subject name
                 }
-                d.addRow(v2);
+                d.addRow(v2); // Add the vector as a new row in the table
             }
         } catch (SQLException ex) {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
