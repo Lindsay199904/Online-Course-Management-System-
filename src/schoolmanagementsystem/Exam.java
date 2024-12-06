@@ -60,21 +60,22 @@ public class Exam extends javax.swing.JFrame {
      * Method to add exam details in the portal
      */
 
-    public Exam(int id, String username, String utype) {
-        setIconImage();
-        setTitle("Exam details");
-        initComponents();
-        Connect();
-        Class_Load();
-        Section_Load();
-        Subject_Load();
-        this.uname = username;
-        jLabel20.setText(uname);
-        this.usertype = utype;
-        jLabel30.setText(usertype);
-        this.id = id;
+   public Exam(int id, String username, String utype) {
+    setIconImage();
+    setTitle("Exam details");
+    initComponents();
+    Connect();
+    Class_Load();
+    Section_Load();
+    Subject_Load();
+    Exam_Load(); // Add this to load exam data immediately
+    this.uname = username;
+    jLabel20.setText(uname);
+    this.usertype = utype;
+    jLabel30.setText(usertype);
+    this.id = id;
 
-        // Disable buttons and fields for "Student" and "Guest" roles
+    // Disable buttons and fields for "Student" and "Guest" roles
     if (utype.equals("Student") || utype.equals("Guest")) {
         savebutton.setEnabled(false);
         editbutton.setEnabled(false);
@@ -83,7 +84,7 @@ public class Exam extends javax.swing.JFrame {
 
         // Disable input fields to prevent manual changes
         txtename.setEditable(false);
-        txtdate.setEnabled(false); // DateChooser requires `setEnabled`
+        txtdate.setEnabled(false);
         txtclass.setEnabled(false);
         txtsection.setEnabled(false);
         txtsubject.setEnabled(false);
@@ -92,7 +93,6 @@ public class Exam extends javax.swing.JFrame {
         // Show read-only access message
         JOptionPane.showMessageDialog(this, "You have read-only access to this page.");
     } else {
-        // Enable buttons for other roles (e.g., Admin, Teacher)
         savebutton.setEnabled(true);
         editbutton.setEnabled(true);
         deletebutton.setEnabled(true);
@@ -175,35 +175,39 @@ public class Exam extends javax.swing.JFrame {
     }
 
     public void Exam_Load() {
-        int c;
-        try {
-            pst = con.prepareStatement("select * from exam");
-            rs = pst.executeQuery();
+    int c;
+    try {
+        // Prepare query to fetch all exam data
+        pst = con.prepareStatement("SELECT * FROM exam");
+        rs = pst.executeQuery();
 
-            ResultSetMetaData rsd = rs.getMetaData();
-            c = rsd.getColumnCount();
+        // Get column metadata
+        ResultSetMetaData rsd = rs.getMetaData();
+        c = rsd.getColumnCount();
 
-            d = (DefaultTableModel) jTable1.getModel();
-            d.setRowCount(0);
-            while (rs.next()) {
-                Vector v2 = new Vector();
-                for (int i = 1; i <= c; i++) {
-                    v2.add(rs.getString("examid"));
-                    v2.add(rs.getString("examname"));
-                    v2.add(rs.getString("examterm"));
-                    v2.add(rs.getString("examdate"));
-                    v2.add(rs.getString("examclass"));
-                    v2.add(rs.getString("examsection"));
-                    v2.add(rs.getString("examsubject"));
+        // Clear the table model
+        d = (DefaultTableModel) jTable1.getModel();
+        d.setRowCount(0);
 
-                }
-                d.addRow(v2);
+        // Populate the table with data
+        while (rs.next()) {
+            Vector v2 = new Vector();
+            for (int i = 1; i <= c; i++) {
+                v2.add(rs.getString("examid"));
+                v2.add(rs.getString("examname"));
+                v2.add(rs.getString("examterm"));
+                v2.add(rs.getString("examdate"));
+                v2.add(rs.getString("examclass"));
+                v2.add(rs.getString("examsection"));
+                v2.add(rs.getString("examsubject"));
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+            d.addRow(v2);
         }
-
+    } catch (SQLException ex) {
+        Logger.getLogger(Exam.class.getName()).log(Level.SEVERE, null, ex);
+        JOptionPane.showMessageDialog(this, "Error loading exam details: " + ex.getMessage());
     }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
