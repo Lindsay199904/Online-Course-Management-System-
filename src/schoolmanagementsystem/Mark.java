@@ -30,107 +30,111 @@ public class Mark extends javax.swing.JFrame {
      * Creates new form Mark
      */
     public Mark() {
-        initComponents();
-        Connect();
-        Subject_Load();
-        Examterm_Load();
-        Mark_Load();
-        Class_Load();
-        setIconImage();
-        setTitle("Mark page");
+        initComponents(); // Initialize UI components
+        Connect(); // Establish database connection
+        Subject_Load(); // Load subjects into the dropdown
+        Examterm_Load(); // Load exam terms into the dropdown
+        Mark_Load(); // Load marks data into the table
+        Class_Load(); // Load classes into the dropdown
+        setIconImage(); // Set the application icon
+        setTitle("Mark page"); // Set the window title
     }
 
     private void setIconImage() {
-        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png")));
-
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png"))); // Set application icon
     }
 
-    int id;
-    String uname;
-    String usertype;
-    
-    /**
-     * Method to add marks 
-     */
+    int id; // User ID
+    String uname; // Username
+    String usertype; // User type (e.g., Admin, Teacher, Student)
 
+    /**
+     * Constructor with user details to manage role-based access control
+     */
     public Mark(int id, String username, String utype) {
-        setIconImage();
-        setTitle("Mark page");
-        initComponents();
-        Connect();
-        Subject_Load();
-        Examterm_Load();
-        Mark_Load();
-        Class_Load();
+        setIconImage(); // Set application icon
+        setTitle("Mark page"); // Set window title
+        initComponents(); // Initialize UI components
+        Connect(); // Establish database connection
+        Subject_Load(); // Load subjects into the dropdown
+        Examterm_Load(); // Load exam terms into the dropdown
+        Mark_Load(); // Load marks data into the table
+        Class_Load(); // Load classes into the dropdown
 
         this.uname = username;
-        jLabel20.setText(uname);
+        jLabel20.setText(uname); // Display username in UI
 
         this.usertype = utype;
-        jLabel30.setText(utype);
+        jLabel30.setText(utype); // Display user type in UI
 
         this.id = id;
-         // Disable buttons for "Student" and "Guest" roles
-    // Disable buttons for "Student" and "Guest" roles
-    if (utype.equals("Student") || utype.equals("Guest")) {
-        savebutton.setEnabled(false);
-        editbutton.setEnabled(false);
-        deletebutton.setEnabled(false);
-        clearbutton.setEnabled(false);
 
-        // Optional: disable fields to prevent manual changes
-        txtid.setEditable(false);
-        txtmark.setEditable(false);
-        txtterm.setEnabled(false);
-        txtclass.setEnabled(false);
-        txtsubject.setEnabled(false);
+        // Disable buttons and fields for "Student" and "Guest" roles
+        if (utype.equals("Student") || utype.equals("Guest")) {
+            savebutton.setEnabled(false); // Disable save button
+            editbutton.setEnabled(false); // Disable edit button
+            deletebutton.setEnabled(false); // Disable delete button
+            clearbutton.setEnabled(false); // Disable clear button
 
-        // Show read-only access message
-        JOptionPane.showMessageDialog(this, "You have read-only access to this page.");
-    } else {
-        // Enable buttons for other roles (e.g., Admin, Teacher)
-        savebutton.setEnabled(true);
-        editbutton.setEnabled(true);
-        deletebutton.setEnabled(true);
-        clearbutton.setEnabled(true);
+            // Disable input fields to prevent manual edits
+            txtid.setEditable(false);
+            txtmark.setEditable(false);
+            txtterm.setEnabled(false);
+            txtclass.setEnabled(false);
+            txtsubject.setEnabled(false);
+
+            // Show a read-only access message
+            JOptionPane.showMessageDialog(this, "You have read-only access to this page.");
+        } else {
+            // Enable buttons for privileged users (e.g., Admin, Teacher)
+            savebutton.setEnabled(true);
+            editbutton.setEnabled(true);
+            deletebutton.setEnabled(true);
+            clearbutton.setEnabled(true);
+        }
     }
-}
-    Connection con;
-    PreparedStatement pst;
-    ResultSet rs;
-    DefaultTableModel d;
 
-       public void Connect() {
-    try {
-        // Load properties file
-        Properties properties = new Properties();
-        properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
+    Connection con; // Database connection object
+    PreparedStatement pst; // Statement object for executing SQL queries
+    ResultSet rs; // Result set for storing query results
+    DefaultTableModel d; // Table model for displaying data in the UI
 
-        // Get database details
-        String url = properties.getProperty("db.url");
-        String username = properties.getProperty("db.username");
-        String password = properties.getProperty("db.password");
-
-        // Load database driver
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        con = DriverManager.getConnection(url, username, password);
-        System.out.println("Database connection successful.");
-    } catch (IOException e) {
-        System.out.println("Error loading properties file: " + e.getMessage());
-    } catch (SQLException ex) {
-        Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
-    } catch (ClassNotFoundException ex) {
-        Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-    }
-}
-
-    public void Subject_Load() {
-
+    /**
+     * Method to establish a database connection
+     */
+    public void Connect() {
         try {
-            pst = con.prepareStatement("select Distinct subjectname from subject");
+            // Load properties file containing database configurations
+            Properties properties = new Properties();
+            properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
+
+            // Retrieve database connection details from properties
+            String url = properties.getProperty("db.url");
+            String username = properties.getProperty("db.username");
+            String password = properties.getProperty("db.password");
+
+            // Load the JDBC driver and connect to the database
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection(url, username, password);
+            System.out.println("Database connection successful.");
+        } catch (IOException e) {
+            System.out.println("Error loading properties file: " + e.getMessage());
+        } catch (SQLException ex) {
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Method to load subjects into the dropdown
+     */
+    public void Subject_Load() {
+        try {
+            pst = con.prepareStatement("SELECT DISTINCT subjectname FROM subject");
             rs = pst.executeQuery();
 
-            //txtclass.removeAllItems();
+            // Populate subject dropdown
             while (rs.next()) {
                 txtsubject.addItem(rs.getString("subjectname"));
             }
@@ -139,13 +143,15 @@ public class Mark extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Method to load exam terms into the dropdown
+     */
     public void Examterm_Load() {
-
         try {
-            pst = con.prepareStatement("select Distinct examterm from exam");
+            pst = con.prepareStatement("SELECT DISTINCT examterm FROM exam");
             rs = pst.executeQuery();
 
-            //txtclass.removeAllItems();
+            // Populate exam term dropdown
             while (rs.next()) {
                 txtterm.addItem(rs.getString("examterm"));
             }
@@ -154,13 +160,15 @@ public class Mark extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Method to load classes into the dropdown
+     */
     public void Class_Load() {
-
         try {
-            pst = con.prepareStatement("select Distinct classname from class");
+            pst = con.prepareStatement("SELECT DISTINCT classname FROM class");
             rs = pst.executeQuery();
 
-            //txtclass.removeAllItems();
+            // Populate class dropdown
             while (rs.next()) {
                 txtclass.addItem(rs.getString("classname"));
             }
@@ -168,32 +176,35 @@ public class Mark extends javax.swing.JFrame {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
- /**
-     * Method to load marks
+
+    /**
+     * Method to load marks into the table
      */
     public void Mark_Load() {
-        int c;
+        int c; // Number of columns in the result set
         try {
-            pst = con.prepareStatement("select * from mark");
+            pst = con.prepareStatement("SELECT * FROM mark"); // Query to fetch all marks
             rs = pst.executeQuery();
 
             ResultSetMetaData rsd = rs.getMetaData();
             c = rsd.getColumnCount();
 
+            // Initialize the table model and clear existing data
             d = (DefaultTableModel) jTable1.getModel();
             d.setRowCount(0);
+
+            // Populate table rows with marks data
             while (rs.next()) {
                 Vector v2 = new Vector();
                 for (int i = 1; i <= c; i++) {
-                    v2.add(rs.getString("studentid"));
-                    v2.add(rs.getString("studentname"));
-                    v2.add(rs.getString("subject"));
-                    v2.add(rs.getString("class"));
-                    v2.add(rs.getString("marks"));
-                    v2.add(rs.getString("term"));
-
+                    v2.add(rs.getString("studentid")); // Add student ID
+                    v2.add(rs.getString("studentname")); // Add student name
+                    v2.add(rs.getString("subject")); // Add subject
+                    v2.add(rs.getString("class")); // Add class
+                    v2.add(rs.getString("marks")); // Add marks
+                    v2.add(rs.getString("term")); // Add exam term
                 }
-                d.addRow(v2);
+                d.addRow(v2); // Add the row to the table
             }
         } catch (SQLException ex) {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
