@@ -19,51 +19,50 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
+
 /**
- * Class to handle the Mark management page in the School Management System.
- * Provides functionality to load, add, edit, and delete marks.
- * 
+ *
  * @lindsay blood
  */
 public class Mark extends javax.swing.JFrame {
 
-    // Default constructor to initialize components and set up the page
+    /**
+     * Creates new form Mark
+     */
     public Mark() {
-        initComponents(); // Initialize UI components
-        Connect(); // Establish database connection
-        Subject_Load(); // Load subjects into the dropdown
-        Examterm_Load(); // Load exam terms into the dropdown
-        Mark_Load(); // Load marks data into the table
-        Class_Load(); // Load class data into the dropdown
-        setIconImage(); // Set custom application icon
-        setTitle("Mark page"); // Set window title
+        initComponents();
+        Connect();
+        Subject_Load();
+        Examterm_Load();
+        Mark_Load();
+        Class_Load();
+        setIconImage();
+        setTitle("Mark page");
     }
 
-    // Method to set the application icon
     private void setIconImage() {
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png")));
+
     }
 
-    // Class-level variables to store user details and database connection
     int id;
     String uname;
     String usertype;
-
+    
     /**
-     * Overloaded constructor to initialize with user-specific data.
-     * Sets up permissions based on user type.
+     * Method to add marks 
      */
-    public Mark(int id, String username, String utype) {
-        setIconImage(); // Set application icon
-        setTitle("Mark page"); // Set window title
-        initComponents(); // Initialize UI components
-        Connect(); // Establish database connection
-        Subject_Load(); // Load subjects
-        Examterm_Load(); // Load exam terms
-        Mark_Load(); // Load marks
-        Class_Load(); // Load classes
 
-        // Assign user details
+    public Mark(int id, String username, String utype) {
+        setIconImage();
+        setTitle("Mark page");
+        initComponents();
+        Connect();
+        Subject_Load();
+        Examterm_Load();
+        Mark_Load();
+        Class_Load();
+
         this.uname = username;
         jLabel20.setText(uname);
 
@@ -71,67 +70,64 @@ public class Mark extends javax.swing.JFrame {
         jLabel30.setText(utype);
 
         this.id = id;
-
-        // Adjust button permissions based on user type
-        if (utype.equals("Student") || utype.equals("Guest")) {
+        if (utype.equals("Student")) {
             savebutton.setEnabled(false);
             editbutton.setEnabled(false);
             deletebutton.setEnabled(false);
             clearbutton.setEnabled(false);
+        }
+
+        if (utype.equals("Guest")) {
+            savebutton.setEnabled(false);
+            editbutton.setEnabled(false);
+            deletebutton.setEnabled(false);
+            clearbutton.setEnabled(false);
+
         } else {
             savebutton.setEnabled(true);
             editbutton.setEnabled(true);
             deletebutton.setEnabled(true);
             clearbutton.setEnabled(true);
         }
+
     }
 
-    // Database connection variables
     Connection con;
     PreparedStatement pst;
     ResultSet rs;
     DefaultTableModel d;
 
-    /**
-     * Method to establish a connection to the database.
-     * Reads configuration details from a properties file.
-     */
-    public void Connect() {
-        try {
-            // Load properties file with database configuration
-            Properties properties = new Properties();
-            properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
+       public void Connect() {
+    try {
+        // Load properties file
+        Properties properties = new Properties();
+        properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
 
-            // Retrieve database details from properties
-            String url = properties.getProperty("db.url");
-            String username = properties.getProperty("db.username");
-            String password = properties.getProperty("db.password");
+        // Get database details
+        String url = properties.getProperty("db.url");
+        String username = properties.getProperty("db.username");
+        String password = properties.getProperty("db.password");
 
-            // Load and initialize the database driver
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            // Establish connection to the database
-            con = DriverManager.getConnection(url, username, password);
-            System.out.println("Database connection successful.");
-        } catch (IOException e) {
-            System.out.println("Error loading properties file: " + e.getMessage());
-        } catch (SQLException ex) {
-            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        // Load database driver
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        con = DriverManager.getConnection(url, username, password);
+        System.out.println("Database connection successful.");
+    } catch (IOException e) {
+        System.out.println("Error loading properties file: " + e.getMessage());
+    } catch (SQLException ex) {
+        Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+    } catch (ClassNotFoundException ex) {
+        Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
     }
+}
 
-    /**
-     * Load subject names from the database into the subject dropdown.
-     */
     public void Subject_Load() {
+
         try {
-            // Query to retrieve unique subject names
             pst = con.prepareStatement("select Distinct subjectname from subject");
             rs = pst.executeQuery();
 
-            // Populate the dropdown
+            //txtclass.removeAllItems();
             while (rs.next()) {
                 txtsubject.addItem(rs.getString("subjectname"));
             }
@@ -140,16 +136,13 @@ public class Mark extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Load exam terms from the database into the term dropdown.
-     */
     public void Examterm_Load() {
+
         try {
-            // Query to retrieve unique exam terms
             pst = con.prepareStatement("select Distinct examterm from exam");
             rs = pst.executeQuery();
 
-            // Populate the dropdown
+            //txtclass.removeAllItems();
             while (rs.next()) {
                 txtterm.addItem(rs.getString("examterm"));
             }
@@ -158,16 +151,13 @@ public class Mark extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Load class names from the database into the class dropdown.
-     */
     public void Class_Load() {
+
         try {
-            // Query to retrieve unique class names
             pst = con.prepareStatement("select Distinct classname from class");
             rs = pst.executeQuery();
 
-            // Populate the dropdown
+            //txtclass.removeAllItems();
             while (rs.next()) {
                 txtclass.addItem(rs.getString("classname"));
             }
@@ -175,26 +165,20 @@ public class Mark extends javax.swing.JFrame {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    /**
-     * Load marks data from the database into the table.
+ /**
+     * Method to load marks
      */
     public void Mark_Load() {
-        int c; // Column count
+        int c;
         try {
-            // Query to retrieve all marks data
             pst = con.prepareStatement("select * from mark");
             rs = pst.executeQuery();
 
-            // Get metadata to determine the number of columns
             ResultSetMetaData rsd = rs.getMetaData();
             c = rsd.getColumnCount();
 
-            // Prepare table model
             d = (DefaultTableModel) jTable1.getModel();
-            d.setRowCount(0); // Clear existing rows
-
-            // Populate table with rows from the result set
+            d.setRowCount(0);
             while (rs.next()) {
                 Vector v2 = new Vector();
                 for (int i = 1; i <= c; i++) {
@@ -204,6 +188,7 @@ public class Mark extends javax.swing.JFrame {
                     v2.add(rs.getString("class"));
                     v2.add(rs.getString("marks"));
                     v2.add(rs.getString("term"));
+
                 }
                 d.addRow(v2);
             }
@@ -218,7 +203,7 @@ public class Mark extends javax.swing.JFrame {
      * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jDesktopPane1 = new javax.swing.JDesktopPane();
@@ -481,17 +466,17 @@ public class Mark extends javax.swing.JFrame {
 
         pack();
         setLocationRelativeTo(null);
-    }// </editor-fold>                        
+    }// </editor-fold>//GEN-END:initComponents
 
-    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {                                     
+    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
         // TODO add your handling code here:
         Login l = new Login();
         l.setVisible(true);
         this.setVisible(false);
 
-    }                                    
+    }//GEN-LAST:event_jLabel2MouseClicked
 
-    private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {                                     
+    private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
         // TODO add your handling code here:
         try {
             // TODO add your handling code here:
@@ -501,49 +486,58 @@ public class Mark extends javax.swing.JFrame {
         } catch (URISyntaxException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }                                    
+    }//GEN-LAST:event_jLabel5MouseClicked
 
-    private void jMenu2MouseClicked(java.awt.event.MouseEvent evt) {                                    
+    private void jMenu2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu2MouseClicked
         // TODO add your handling code here:
         About a = new About();
         a.setVisible(true);
         this.setVisible(false);
-    }                                   
+    }//GEN-LAST:event_jMenu2MouseClicked
 
-    private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {                                    
+    private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu1MouseClicked
         // TODO add your handling code here:
         Main m = new Main(id, uname, usertype);
         m.setVisible(true);
         this.setVisible(false);
-    }                                   
+    }//GEN-LAST:event_jMenu1MouseClicked
+	
+private void searchButtonMouseClicked(java.awt.event.MouseEvent evt) {                                          
+    try {
+        // Get the entered Student ID
+        String sid = txtid.getText().trim();
 
-    private void searchButtonMouseClicked(java.awt.event.MouseEvent evt) {                                          
-        try {
-            // TODO add your handling code here:
-            String sid = txtid.getText();
-
-            pst = con.prepareStatement("select * from student where studentid=?");
-            pst.setString(1, sid);
-            rs = pst.executeQuery();
-
-            if (rs.next() == false) {
-                JOptionPane.showMessageDialog(this, "Student NOT FOUND");
-                txtname.setText("");
-            } else {
-                String name = rs.getString("studentname");
-                String classname = rs.getString("studentclass");
-
-                txtname.setText(name.trim());
-                txtclass.addItem(classname.trim());
-
-            }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(Mark.class.getName()).log(Level.SEVERE, null, ex);
+        if (sid.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a Student ID");
+            return;
         }
-    }                                         
 
-    private void savebuttonActionPerformed(java.awt.event.ActionEvent evt) {                                           
+        // Prepare the SQL query
+        pst = con.prepareStatement("SELECT * FROM student WHERE studentid = ?");
+        pst.setString(1, sid);
+        rs = pst.executeQuery();
+
+        // Check if a record is found
+        if (!rs.next()) {
+            JOptionPane.showMessageDialog(this, "Student NOT FOUND");
+            txtname.setText("");
+            txtclass.setSelectedIndex(-1); // Reset dropdown
+        } else {
+            // Populate fields with the data from the database
+            String name = rs.getString("studentname");
+            String classname = rs.getString("studentclass");
+
+            txtname.setText(name.trim());
+            txtclass.setSelectedItem(classname.trim()); // Ensure classname exists in dropdown
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(Mark.class.getName()).log(Level.SEVERE, null, ex);
+        JOptionPane.showMessageDialog(this, "Error fetching student details: " + ex.getMessage());
+    }
+}  
+//GEN-LAST:event_searchButtonMouseClicked
+
+    private void savebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savebuttonActionPerformed
         // TODO add your handling code here:
         try {
             // TODO add your handling code here:
@@ -577,9 +571,9 @@ public class Mark extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }                                          
+    }//GEN-LAST:event_savebuttonActionPerformed
 
-    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {                                     
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         // TODO add your handling code here:
         d = (DefaultTableModel) jTable1.getModel();
         int selectIndex = jTable1.getSelectedRow();
@@ -591,9 +585,9 @@ public class Mark extends javax.swing.JFrame {
         txtmark.setText(d.getValueAt(selectIndex, 4).toString());
         txtterm.setSelectedItem(d.getValueAt(selectIndex, 5).toString());
         savebutton.setEnabled(false);
-    }                                    
+    }//GEN-LAST:event_jTable1MouseClicked
 
-    private void clearbuttonActionPerformed(java.awt.event.ActionEvent evt) {                                            
+    private void clearbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearbuttonActionPerformed
         // TODO add your handling code here:
         txtid.setText("");
         txtname.setText("");
@@ -607,9 +601,9 @@ public class Mark extends javax.swing.JFrame {
         Mark_Load();
         savebutton.setEnabled(true);
 
-    }                                           
+    }//GEN-LAST:event_clearbuttonActionPerformed
 
-    private void editbuttonActionPerformed(java.awt.event.ActionEvent evt) {                                           
+    private void editbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editbuttonActionPerformed
         // TODO add your handling code here:
         try {
             // TODO add your handling code here:
@@ -649,9 +643,9 @@ public class Mark extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }                                          
+    }//GEN-LAST:event_editbuttonActionPerformed
 
-    private void deletebuttonActionPerformed(java.awt.event.ActionEvent evt) {                                             
+    private void deletebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deletebuttonActionPerformed
         // TODO add your handling code here:
         try {
             // TODO add your handling code here:
@@ -679,7 +673,7 @@ public class Mark extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }                                            
+    }//GEN-LAST:event_deletebuttonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -716,7 +710,7 @@ public class Mark extends javax.swing.JFrame {
         });
     }
 
-    // Variables declaration - do not modify                     
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton clearbutton;
     private javax.swing.JButton deletebutton;
     private javax.swing.JButton editbutton;
@@ -752,5 +746,5 @@ public class Mark extends javax.swing.JFrame {
     private javax.swing.JTextField txtname;
     private javax.swing.JComboBox<String> txtsubject;
     private javax.swing.JComboBox<String> txtterm;
-    // End of variables declaration                   
+    // End of variables declaration//GEN-END:variables
 }
