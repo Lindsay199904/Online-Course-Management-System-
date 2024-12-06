@@ -65,11 +65,11 @@ public class Main extends javax.swing.JFrame {
             break;
 
         case "Teacher":
-            accountbutton.setVisible(true);
+            accountbutton.setVisible(false);
             subjectbutton.setVisible(true);
             exambutton.setVisible(true);
-            studentbutton.setVisible(true);
-            teacherbutton.setVisible(true);
+            studentbutton.setVisible(false);
+            teacherbutton.setVisible(false);
             markbutton1.setVisible(true);
             classbutton1.setVisible(true);
             break;
@@ -90,19 +90,11 @@ public class Main extends javax.swing.JFrame {
             exambutton.setVisible(false);
             studentbutton.setVisible(false);
             teacherbutton.setVisible(false);
-            markbutton1.setVisible(false);
+            markbutton1.setVisible(true);
             classbutton1.setVisible(false);
             break;
 
-        default:
-            accountbutton.setVisible(false);
-            subjectbutton.setVisible(false);
-            exambutton.setVisible(false);
-            studentbutton.setVisible(false);
-            teacherbutton.setVisible(false);
-            markbutton1.setVisible(false);
-            classbutton1.setVisible(false);
-            break;
+       
     }
 
     // Refresh layout to apply visibility changes
