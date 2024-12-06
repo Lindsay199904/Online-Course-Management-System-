@@ -1,50 +1,72 @@
-/**
- * Default constructor for the Subject class.
- * Initializes the Subject page and loads subject data.
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-public Subject() {
-    initComponents(); // Initialize GUI components
-    Connect(); // Establish connection to the database
-    Subject_Load(); // Load subjects from the database
-    setIconImage(); // Set the window icon
-    setTitle("Subject page"); // Set the window title
-}
+package schoolmanagementsystem;
+
+import java.awt.Desktop;
+import java.awt.Toolkit;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.Properties;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
- * Sets the application icon.
+ *
+ * @Lindsay Blood
  */
-private void setIconImage() {
-    setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png")));
-}
+public class Subject extends javax.swing.JFrame {
 
-// Variables to store user-specific data
-int id; // User ID
-String uname; // Username
-String usertype; // User type (e.g., Admin, Student, Guest)
+    /**
+     * Creates new form TestSubject
+     */
+    public Subject() {
+        initComponents();
+        Connect();
+        Subject_Load();
+        setIconImage();
+        setTitle("Subject page");
+    }
 
-/**
- * Overloaded constructor for the Subject class.
- * Initializes the Subject page with user details and permissions.
- * 
- * @param id        The user ID.
- * @param username  The username of the logged-in user.
- * @param utype     The user type (e.g., Admin, Student, Guest).
- */
-public Subject(int id, String username, String utype) {
-    setIconImage(); // Set the window icon
-    setTitle("Subject page"); // Set the window title
-    initComponents(); // Initialize GUI components
-    Connect(); // Establish connection to the database
-    Subject_Load(); // Load subjects from the database
-    this.uname = username; // Set the username
-    jLabel20.setText(uname); // Display the username in the GUI
+    private void setIconImage() {
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("logo.png")));
 
-    this.usertype = utype; // Set the user type
-    jLabel30.setText(utype); // Display the user type in the GUI
+    }
 
-    this.id = id; // Set the user ID
+    int id;
+    String uname;
+    String usertype;
+    
+    /**
+     * Method to add subject info and assign it to class and student
+     */
 
-    // Adjust button permissions based on user type
+    public Subject(int id, String username, String utype) {
+        setIconImage();
+        setTitle("Subject page");
+        initComponents();
+        Connect();
+        Subject_Load();
+        this.uname = username;
+        jLabel20.setText(uname);
+
+        this.usertype = utype;
+        jLabel30.setText(utype);
+
+        this.id = id;
+       // Disable editing for students
     if (utype.equals("Student")) {
         savebutton.setEnabled(false);
         editbutton.setEnabled(false);
@@ -52,12 +74,8 @@ public Subject(int id, String username, String utype) {
         clearbutton.setEnabled(false);
     }
 
-    if (utype.equals("Guest")) {
-        savebutton.setEnabled(false);
-        editbutton.setEnabled(false);
-        deletebutton.setEnabled(false);
-        clearbutton.setEnabled(false);
-    } else {
+    // Enable editing for non-students
+    if (utype.equals("Admin") || utype.equals("Teacher")) {
         savebutton.setEnabled(true);
         editbutton.setEnabled(true);
         deletebutton.setEnabled(true);
@@ -65,75 +83,60 @@ public Subject(int id, String username, String utype) {
     }
 }
 
-// Variables for database connectivity
-Connection con; // Database connection object
-PreparedStatement pst; // PreparedStatement for SQL queries
-ResultSet rs; // ResultSet to store query results
-DefaultTableModel d; // DefaultTableModel for populating tables
+    Connection con;
+    PreparedStatement pst;
+    ResultSet rs;
+    DefaultTableModel d;
 
-/**
- * Establishes a connection to the database using credentials from a properties file.
- */
-public void Connect() {
+      public void Connect() {
     try {
-        // Load properties file containing database credentials
+        // Load properties file
         Properties properties = new Properties();
         properties.load(new FileInputStream("src\\schoolmanagementsystem\\application.properties"));
 
-        // Extract database details from the properties file
+        // Get database details
         String url = properties.getProperty("db.url");
         String username = properties.getProperty("db.username");
         String password = properties.getProperty("db.password");
 
-        // Load the MySQL database driver and establish a connection
+        // Load database driver
         Class.forName("com.mysql.cj.jdbc.Driver");
         con = DriverManager.getConnection(url, username, password);
         System.out.println("Database connection successful.");
     } catch (IOException e) {
-        // Handle errors in loading the properties file
         System.out.println("Error loading properties file: " + e.getMessage());
     } catch (SQLException ex) {
-        // Log SQL-related exceptions
         Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
     } catch (ClassNotFoundException ex) {
-        // Log errors related to the database driver
         Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
     }
 }
 
-/**
- * Loads subject data from the database and populates the table in the GUI.
- */
-public void Subject_Load() {
-    int c; // Variable to store the number of columns in the ResultSet
-    try {
-        // Execute query to fetch all subject records
-        pst = con.prepareStatement("select * from subject");
-        rs = pst.executeQuery();
+    public void Subject_Load() {
+        int c;
+        try {
+            pst = con.prepareStatement("select * from subject");
+            rs = pst.executeQuery();
 
-        // Get metadata to determine the number of columns
-        ResultSetMetaData rsd = rs.getMetaData();
-        c = rsd.getColumnCount();
+            ResultSetMetaData rsd = rs.getMetaData();
+            c = rsd.getColumnCount();
 
-        // Clear the existing rows in the table model
-        d = (DefaultTableModel) jTable1.getModel();
-        d.setRowCount(0);
+            d = (DefaultTableModel) jTable1.getModel();
+            d.setRowCount(0);
+            while (rs.next()) {
+                Vector v2 = new Vector();
+                for (int i = 1; i <= c; i++) {
+                    v2.add(rs.getString("id"));
+                    v2.add(rs.getString("subjectcode"));
+                    v2.add(rs.getString("subjectname"));
 
-        // Loop through the ResultSet and add each row to the table model
-        while (rs.next()) {
-            Vector v2 = new Vector();
-            for (int i = 1; i <= c; i++) {
-                v2.add(rs.getString("id")); // Add the subject ID
-                v2.add(rs.getString("subjectcode")); // Add the subject code
-                v2.add(rs.getString("subjectname")); // Add the subject name
+                }
+                d.addRow(v2);
             }
-            d.addRow(v2); // Add the row to the table model
+        } catch (SQLException ex) {
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
         }
-    } catch (SQLException ex) {
-        // Log SQL-related exceptions
-        Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
     }
-}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -141,7 +144,7 @@ public void Subject_Load() {
      * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
@@ -393,184 +396,180 @@ public void Subject_Load() {
 
         pack();
         setLocationRelativeTo(null);
-    }// </editor-fold>                        
+    }// </editor-fold>//GEN-END:initComponents
 
-  private void savebuttonActionPerformed(java.awt.event.ActionEvent evt) {                                           
-    // Handle the save button action
-    try {
-        // Get the input values for subject code and subject name
-        String code = txtsubjectcode.getText();
-        String subject = txtsubject.getText();
+    private void savebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savebuttonActionPerformed
+        // TODO add your handling code here:
+        try {
+            // TODO add your handling code here:
+            String code = txtsubjectcode.getText();
+            String subject = txtsubject.getText();
 
-        // Prepare the SQL statement to insert subject details
-        pst = con.prepareStatement("insert into subject(subjectcode,subjectname)values(?,?)");
-        pst.setString(1, code); // Set subject code
-        pst.setString(2, subject); // Set subject name
+            pst = con.prepareStatement("insert into subject(subjectcode,subjectname)values(?,?)");
+            pst.setString(1, code);
+            pst.setString(2, subject);
 
-        // Execute the SQL statement
-        pst.executeUpdate();
-        JOptionPane.showMessageDialog(this, "Subject details added successfully...");
+            pst.executeUpdate();
+            JOptionPane.showMessageDialog(this, "Subject details added successfully...");
+            Subject_Load();
+        } catch (SQLException ex) {
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_savebuttonActionPerformed
 
-        // Reload the subject table to reflect the new entry
-        Subject_Load();
-    } catch (SQLException ex) {
-        Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
-    }
-}                                          
+    private void editbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editbuttonActionPerformed
+        // TODO add your handling code here:
+        try {
+            // TODO add your handling code here:
+            d = (DefaultTableModel) jTable1.getModel();
+            int selectIndex = jTable1.getSelectedRow();
 
-private void editbuttonActionPerformed(java.awt.event.ActionEvent evt) {                                           
-    // Handle the edit button action
-    try {
-        // Get the selected row and the ID of the subject
+            String id = d.getValueAt(selectIndex, 0).toString();
+
+            String code = txtsubjectcode.getText();
+            String subject = txtsubject.getText();
+
+            pst = con.prepareStatement("update subject set subjectcode=?,subjectname=? where id=?");
+
+            pst.setString(1, code);
+            pst.setString(2, subject);
+            pst.setString(3, id);
+            pst.executeUpdate();
+            JOptionPane.showMessageDialog(this, "subject details edited successfully...");
+            savebutton.setEnabled(true);
+
+            txtsubject.setText("");
+            txtsubjectcode.setText("");
+
+            txtsubjectcode.requestFocus();
+
+            Subject_Load();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_editbuttonActionPerformed
+
+    private void deletebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deletebuttonActionPerformed
+        // TODO add your handling code here:
+        try {
+            // TODO add your handling code here:
+            d = (DefaultTableModel) jTable1.getModel();
+            int selectIndex = jTable1.getSelectedRow();
+
+            String id = d.getValueAt(selectIndex, 0).toString();
+
+            pst = con.prepareStatement("delete from subject where id=?");
+            pst.setString(1, id);
+            pst.executeUpdate();
+            JOptionPane.showMessageDialog(this, "subject details deleted successfully...");
+            savebutton.setEnabled(true);
+
+            txtsubjectcode.setText("");
+            txtsubject.setText("");
+
+            Subject_Load();
+            savebutton.setEnabled(true);
+
+        } catch (SQLException ex) {
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_deletebuttonActionPerformed
+
+    private void clearbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearbuttonActionPerformed
+        // TODO add your handling code here:
+        txtsubjectcode.setText("");
+        txtsubject.setText("");
+        savebutton.setEnabled(true);
+    }//GEN-LAST:event_clearbuttonActionPerformed
+
+    private void jMenu1MenuKeyPressed(javax.swing.event.MenuKeyEvent evt) {//GEN-FIRST:event_jMenu1MenuKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenu1MenuKeyPressed
+
+    private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu1MouseClicked
+        // TODO add your handling code here:
+        Main m = new Main(id, uname, usertype);
+        m.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_jMenu1MouseClicked
+
+    private void jMenu2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu2MouseClicked
+        // TODO add your handling code here:
+        About a = new About();
+        a.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_jMenu2MouseClicked
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        // TODO add your handling code here:
         d = (DefaultTableModel) jTable1.getModel();
         int selectIndex = jTable1.getSelectedRow();
+
         String id = d.getValueAt(selectIndex, 0).toString();
+        txtsubjectcode.setText(d.getValueAt(selectIndex, 1).toString());
+        txtsubject.setText(d.getValueAt(selectIndex, 2).toString());
 
-        // Get the updated values for subject code and subject name
-        String code = txtsubjectcode.getText();
-        String subject = txtsubject.getText();
+        savebutton.setEnabled(false);
+    }//GEN-LAST:event_jTable1MouseClicked
 
-        // Prepare the SQL statement to update subject details
-        pst = con.prepareStatement("update subject set subjectcode=?,subjectname=? where id=?");
-        pst.setString(1, code); // Set subject code
-        pst.setString(2, subject); // Set subject name
-        pst.setString(3, id); // Set subject ID
+    private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
+        // TODO add your handling code here:
+        try {
+            // TODO add your handling code here:
+            Desktop.getDesktop().browse(new URI("https://github.com/naveenkumar-j"));
+        } catch (IOException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jLabel5MouseClicked
 
-        // Execute the SQL statement
-        pst.executeUpdate();
-        JOptionPane.showMessageDialog(this, "Subject details edited successfully...");
+    private void jLabel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel6MouseClicked
+        // TODO add your handling code here:
+        Login l = new Login();
+        l.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_jLabel6MouseClicked
 
-        // Enable save button and clear input fields
-        savebutton.setEnabled(true);
-        txtsubject.setText("");
-        txtsubjectcode.setText("");
-        txtsubjectcode.requestFocus();
-
-        // Reload the subject table to reflect the updated entry
-        Subject_Load();
-    } catch (SQLException ex) {
-        Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
-    }
-}                                          
-
-private void deletebuttonActionPerformed(java.awt.event.ActionEvent evt) {                                             
-    // Handle the delete button action
-    try {
-        // Get the selected row and the ID of the subject
-        d = (DefaultTableModel) jTable1.getModel();
-        int selectIndex = jTable1.getSelectedRow();
-        String id = d.getValueAt(selectIndex, 0).toString();
-
-        // Prepare the SQL statement to delete the subject
-        pst = con.prepareStatement("delete from subject where id=?");
-        pst.setString(1, id); // Set subject ID
-
-        // Execute the SQL statement
-        pst.executeUpdate();
-        JOptionPane.showMessageDialog(this, "Subject details deleted successfully...");
-
-        // Enable save button and clear input fields
-        savebutton.setEnabled(true);
-        txtsubjectcode.setText("");
-        txtsubject.setText("");
-
-        // Reload the subject table to reflect the deleted entry
-        Subject_Load();
-    } catch (SQLException ex) {
-        Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
-    }
-}                                            
-
-private void clearbuttonActionPerformed(java.awt.event.ActionEvent evt) {                                            
-    // Clear all input fields and enable save button
-    txtsubjectcode.setText("");
-    txtsubject.setText("");
-    savebutton.setEnabled(true);
-}                                           
-
-private void jMenu1MenuKeyPressed(javax.swing.event.MenuKeyEvent evt) {                                      
-    // Placeholder for menu key pressed event
-}                                     
-
-private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {                                    
-    // Navigate to the main page
-    Main m = new Main(id, uname, usertype);
-    m.setVisible(true);
-    this.setVisible(false);
-}                                   
-
-private void jMenu2MouseClicked(java.awt.event.MouseEvent evt) {                                    
-    // Navigate to the About page
-    About a = new About();
-    a.setVisible(true);
-    this.setVisible(false);
-}                                   
-
-private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {                                     
-    // Handle table row click to populate input fields
-    d = (DefaultTableModel) jTable1.getModel();
-    int selectIndex = jTable1.getSelectedRow();
-
-    // Populate input fields with selected row data
-    String id = d.getValueAt(selectIndex, 0).toString();
-    txtsubjectcode.setText(d.getValueAt(selectIndex, 1).toString());
-    txtsubject.setText(d.getValueAt(selectIndex, 2).toString());
-
-    // Disable save button while editing
-    savebutton.setEnabled(false);
-}                                    
-
-private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {                                     
-    // Open a GitHub page in the default web browser
-    try {
-        Desktop.getDesktop().browse(new URI("https://github.com/naveenkumar-j"));
-    } catch (IOException ex) {
-        Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-    } catch (URISyntaxException ex) {
-        Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-    }
-}                                    
-
-private void jLabel6MouseClicked(java.awt.event.MouseEvent evt) {                                     
-    // Navigate to the Login page
-    Login l = new Login();
-    l.setVisible(true);
-    this.setVisible(false);
-}                                    
-
-/**
- * Main method to run the application.
- */
-public static void main(String args[]) {
-    /* Set the Nimbus look and feel */
-    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-    try {
-        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-            if ("Nimbus".equals(info.getName())) {
-                javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                break;
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
             }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Subject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Subject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Subject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Subject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-    } catch (ClassNotFoundException ex) {
-        java.util.logging.Logger.getLogger(Subject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-    } catch (InstantiationException ex) {
-        java.util.logging.Logger.getLogger(Subject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-    } catch (IllegalAccessException ex) {
-        java.util.logging.Logger.getLogger(Subject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-    } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-        java.util.logging.Logger.getLogger(Subject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        //</editor-fold>
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new Subject().setVisible(true);
+            }
+        });
     }
-    //</editor-fold>
 
-    /* Create and display the form */
-    java.awt.EventQueue.invokeLater(new Runnable() {
-        public void run() {
-            new Subject().setVisible(true);
-        }
-    });
-}
-
-    // Variables declaration - do not modify                     
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton clearbutton;
     private javax.swing.JButton deletebutton;
     private javax.swing.JButton editbutton;
@@ -596,5 +595,5 @@ public static void main(String args[]) {
     private javax.swing.JButton savebutton;
     private javax.swing.JTextField txtsubject;
     private javax.swing.JTextField txtsubjectcode;
-    // End of variables declaration                   
+    // End of variables declaration//GEN-END:variables
 }
