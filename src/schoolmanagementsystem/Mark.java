@@ -70,28 +70,31 @@ public class Mark extends javax.swing.JFrame {
         jLabel30.setText(utype);
 
         this.id = id;
-        if (utype.equals("Student")) {
-            savebutton.setEnabled(false);
-            editbutton.setEnabled(false);
-            deletebutton.setEnabled(false);
-            clearbutton.setEnabled(false);
-        }
+         // Disable buttons for "Student" and "Guest" roles
+    // Disable buttons for "Student" and "Guest" roles
+    if (utype.equals("Student") || utype.equals("Guest")) {
+        savebutton.setEnabled(false);
+        editbutton.setEnabled(false);
+        deletebutton.setEnabled(false);
+        clearbutton.setEnabled(false);
 
-        if (utype.equals("Guest")) {
-            savebutton.setEnabled(false);
-            editbutton.setEnabled(false);
-            deletebutton.setEnabled(false);
-            clearbutton.setEnabled(false);
+        // Optional: disable fields to prevent manual changes
+        txtid.setEditable(false);
+        txtmark.setEditable(false);
+        txtterm.setEnabled(false);
+        txtclass.setEnabled(false);
+        txtsubject.setEnabled(false);
 
-        } else {
-            savebutton.setEnabled(true);
-            editbutton.setEnabled(true);
-            deletebutton.setEnabled(true);
-            clearbutton.setEnabled(true);
-        }
-
+        // Show read-only access message
+        JOptionPane.showMessageDialog(this, "You have read-only access to this page.");
+    } else {
+        // Enable buttons for other roles (e.g., Admin, Teacher)
+        savebutton.setEnabled(true);
+        editbutton.setEnabled(true);
+        deletebutton.setEnabled(true);
+        clearbutton.setEnabled(true);
     }
-
+}
     Connection con;
     PreparedStatement pst;
     ResultSet rs;
@@ -535,7 +538,7 @@ private void searchButtonMouseClicked(java.awt.event.MouseEvent evt) {
         JOptionPane.showMessageDialog(this, "Error fetching student details: " + ex.getMessage());
     }
 }  
-//GEN-LAST:event_searchButtonMouseClicked
+                                         
 
     private void savebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savebuttonActionPerformed
         // TODO add your handling code here:
