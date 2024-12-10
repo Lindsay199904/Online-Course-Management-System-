@@ -37,6 +37,27 @@ The Online School Management System (OSMS) is a Java-based application designed 
 
 ---
 
+                              |
+                              v
+                 +----------------------------+
+                 |        Service Layer       |
+                 |    (Business Logic)        |
+                 +------------+---------------+
+                              |
+                              v
+                 +----------------------------+
+                 |     Repository Layer       |
+                 | (Database Interactions)    |
+                 +------------+---------------+
+                              |
+                              v
+                 +----------------------------+
+                 |         Data Layer         |
+                 |     (Entities/Models)  |
+                 +----------------------------+
+
+
+
  Installation and Setup
 1. Clone the Repository:
    bash
