@@ -113,6 +113,55 @@ Application overview
 ![image](https://github.com/user-attachments/assets/314b9433-919c-42c4-8eaa-bccc6ec7c2fb)
 
 
+Coding:
+├── Controller
+│   ├── AboutController.java       // Handles display and management of application metadata
+│   ├── ClassController.java       // Manages CRUD operations for classes
+│   ├── ExamController.java        // Handles scheduling and management of exams
+│   ├── LoginController.java       // Manages user login and session handling
+│   ├── MarkController.java        // Manages CRUD operations for student marks
+│   ├── StudentController.java     // Handles CRUD operations for student records
+│   ├── SubjectController.java     // Manages CRUD operations for subjects
+│   └── TeacherController.java     // Handles teacher-related CRUD operations
+│
+├── Model
+│   ├── About.java                 // Represents application metadata
+│   ├── Classes.java               // Represents a school class with attributes and relationships
+│   ├── Exam.java                  // Represents an exam, including date, subject, and class
+│   ├── Login.java                 // Represents user authentication details
+│   ├── Mark.java                  // Represents student marks and related attributes
+│   ├── Student.java               // Represents a student and their details
+│   ├── Subject.java               // Represents a subject taught in the school
+│   └── Teacher.java               // Represents a teacher and their related details
+│
+├── Repository
+│   ├── AboutRepository.java       // Data access for About information
+│   ├── ClassRepository.java       // Data access for Class records
+│   ├── ExamRepository.java        // Data access for Exam information
+│   ├── LoginRepository.java       // Data access for user login records
+│   ├── MarkRepository.java        // Data access for Student marks
+│   ├── StudentRepository.java     // Data access for Student details
+│   ├── SubjectRepository.java     // Data access for Subject information
+│   └── TeacherRepository.java     // Data access for Teacher details
+│
+├── Service
+│   ├── AboutService.java          // Business logic for application metadata
+│   ├── ClassService.java          // Business logic for managing classes
+│   ├── ExamService.java           // Business logic for exams
+│   ├── LoginService.java          // Business logic for login and authentication
+│   ├── MarkService.java           // Business logic for managing marks
+│   ├── StudentService.java        // Business logic for student management
+│   ├── SubjectService.java        // Business logic for subject management
+│   └── TeacherService.java        // Business logic for teacher management
+│
+└── Security
+    ├── JwtUtil.java               // Utility class for JWT generation and validation
+    ├── JwtFilter.java             // Filter for processing JWT tokens in requests
+    └── WebSecurityConfig.java     // Security configuration for the application
+    
+Demo : https://drive.google.com/file/d/1-gmsGoxdPspWYV4BzcOy4y4iTt8u-bkM/view?usp=drivesdk 
+
+
  Contributors
 - Lindsay M. Blood
 
